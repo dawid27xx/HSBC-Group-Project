@@ -16,10 +16,9 @@ Project Description: [https://bitbucket.org/neuedamats/portfoliomanager/src/mast
     - `/create/asset` - add a new asset to a portfolio.
     - `/create/transaction` - add a new transaction relating to a portfolio asset.
 - PATCH:
-    - `/auth/changepwd` - update a user password.
     - `/update/portfolio/name` - update the name of a user portfolio.
     - `/update/asset/quantity` - update the quantity of a given asset.
 - DELETE:
     - `/auth/user` - delete a user profile.
     - `/delete/portfolio` - delete a portfolio.
-    - `/delete/asset` - delete an asset.
+    - `/delete/asset` - delete an asset from a portfolio.
