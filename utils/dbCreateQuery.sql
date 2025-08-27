@@ -35,10 +35,12 @@ FOREIGN KEY (portfolio_id) REFERENCES portfolios(id)
 CREATE TABLE `PortfolioManager`.transactions (   
 id INT AUTO_INCREMENT PRIMARY KEY,   
 user_id INT NOT NULL,
+portfolio_id INT NOT NULL,
 portfolio_asset_id INT NOT NULL,
 transaction_type VARCHAR(255) NOT NULL,
 quantity INT NOT NULL,
 datetime DATETIME NOT NULL, 
 FOREIGN KEY (user_id) REFERENCES users(id),
+FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
 FOREIGN KEY (portfolio_asset_id) REFERENCES portfolioAssets(id)
 );
