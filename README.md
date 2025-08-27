@@ -4,11 +4,11 @@ Project Description: [https://bitbucket.org/neuedamats/portfoliomanager/src/mast
 
 ## Endpoints
 - GET:
-    - `/portfolios/:user_id` - retrieve all portfolios for a given user.
-    - `/assets/:portfolio_id` - retrieve all assets in a given portfolio.
-    - `/transactions/:user_id` - retrieve all transactions for a given user.
-    - `/transactions/:portfolio_id` - retrieve all transactions relating to a given portfolio.
-    - `/transactions/:portfolio_asset_id` - retrieve all transactions relating to a given asset in a portfolio.
+    - `/portfolios/:userId` - retrieve all portfolios for a given user.
+    - `/assets/:portfolioId` - retrieve all assets in a given portfolio.
+    - `/transactions/:userId` - retrieve all transactions for a given user.
+    - `/transactions/:portfolioId` - retrieve all transactions relating to a given portfolio.
+    - `/transactions/:portfolioAssetId` - retrieve all transactions relating to a given asset in a portfolio.
 - POST:
     - `/auth/register` - create a user profile.
     - `/auth/login` - sign in to a user profile.
