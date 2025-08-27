@@ -12,7 +12,7 @@ CREATE TABLE `PortfolioManager`.users (
 
 CREATE TABLE `PortfolioManager`.portfolios (   
 id INT AUTO_INCREMENT PRIMARY KEY,   
-name INT NOT NULL,   
+name VARCHAR(45) NOT NULL,   
 exchange VARCHAR(255) NOT NULL
 );
 
