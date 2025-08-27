@@ -27,6 +27,13 @@ const Transaction = sequelise.define(
                 key: 'id'
             }
                 },
+        portfolio_id: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            references: {
+                model: 'portfolio',
+                key: 'id'
+            }
+        },
         portfolio_asset_id: {
             type: DataTypes.INTEGER.UNSIGNED,
             references: {
