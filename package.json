@@ -1,7 +1,7 @@
 {
   "name": "hsbc-group-project",
   "version": "1.0.0",
-  "description": "",
+  "description": "Project Description: [https://bitbucket.org/neuedamats/portfoliomanager/src/master/](https://bitbucket.org/neuedamats/portfoliomanager/src/master/)",
   "main": "app.js",
   "scripts": {
     "test": "jest"
