@@ -8,9 +8,6 @@ const sequelise = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     dialect: "mysql",
 });
 
-const User = sequelise.import('./user')
-const Portfolio = sequelise.import('/portfolio')
-
 // defines the asset entity
 const UserPortfolio = sequelise.define(
     'UserPortfolio',
@@ -25,14 +22,14 @@ const UserPortfolio = sequelise.define(
         user_id: {
             type: DataTypes.INTEGER.UNSIGNED,
             references: {
-                model: User,
+                model: 'user',
                 key: 'id'
             }
         },
         portfolio_id: {
             type: DataTypes.INTEGER.UNSIGNED,
             references: {
-                model: Portfolio,
+                model: 'portfolio',
                 key: 'id'
             }
         }

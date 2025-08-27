@@ -8,8 +8,6 @@ const sequelise = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     dialect: "mysql",
 });
 
-// const Portfolio = sequelise.import('/portfolio')
-
 
 // defines the asset entity
 const PortfolioAsset = sequelise.define(
