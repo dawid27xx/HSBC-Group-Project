@@ -43,7 +43,27 @@ const UserPortfolio = sequelise.define(
     }
 )
 
-User.belongsToMany(Portfolio, {through: UserPortfolio})
+async function listAllUserPortfolios() {
+    try {
+        const UserPortfolios = await UserPortfolio.findAll();
+        return UserPortfolios;
+    } catch (err) {
+        console.log(err);
+    }
+}
 
+// change this when Asset contains more attributes
+// delete if we are to add assets manually
+async function addUserPortfolio(user_id, portfolio_id) {
+    try {
+        const newUserPortfolio = await UserPortfolio.create({
+            portfolio_id: portfolio_id,
+            user_id: user_id
+        })
+        console.log("UserPortfolio Added", newUserPortfolio.insertedId)
+    } catch (err) {
+        console.log(err);
+    }
+}
 
-// module.exports = {addAsset, listAllAssets};
+module.exports = {addUserPortfolio, listAllUserPortfolios};

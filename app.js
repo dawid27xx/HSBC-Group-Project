@@ -1,11 +1,11 @@
 const express = require('express');
 require('dotenv').config({path: './.env'});
 const app = express();
-const assetRoutes = require('./routes/assetRoutes')
+const userRoutes = require('./routes/userRoutes')
 
 app.use(express.json());
 
-app.use('/assets', assetRoutes);
+app.use('/users', userRoutes);
 
 const PORT = 3000;
 

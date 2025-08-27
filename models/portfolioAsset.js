@@ -44,5 +44,29 @@ const PortfolioAsset = sequelise.define(
     }
 )
 
+async function listAllPortfolioAssets() {
+    try {
+        const portfoliosAssets = await PortfolioAsset.findAll();
+        return portfoliosAssets;
+    } catch (err) {
+        console.log(err);
+    }
+}
 
-// module.exports = {addAsset, listAllAssets};
+// change this when Asset contains more attributes
+// delete if we are to add assets manually
+async function addPortfolioAsset(portfolio_id, ticker, quantity) {
+    try {
+        const newPortfolioAsset = await PortfolioAsset.create({
+            portfolio_id: portfolio_id,
+            ticker: ticker,
+            quantity: quantity
+        })
+        console.log("PortfolioAsset Added", newPortfolioAsset.insertedId)
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+module.exports = {addPortfolioAsset, listAllPortfolioAssets};

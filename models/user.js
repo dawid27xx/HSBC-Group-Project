@@ -35,5 +35,28 @@ const User = sequelise.define(
     }
 )
 
+async function listAllUsers() {
+    try {
+        const users = await User.findAll();
+        return users;
+    } catch (err) {
+        console.log(err);
+    }
+}
 
-// module.exports = {User};
+// change this when Asset contains more attributes
+// delete if we are to add assets manually
+async function addUser(username, password) {
+    try {
+        const newUser = await User.create({
+            username: username,
+            password: password
+        })
+        console.log("User Added", newUser.insertedId)
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+module.exports = {listAllUsers, addUser};
