@@ -8,9 +8,12 @@ const sequelise = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     dialect: "mysql",
 });
 
+const Portfolio = sequelise.import('/portfolio')
+
+
 // defines the asset entity
-const User = sequelise.define(
-    'User',
+const PortfolioAsset = sequelise.define(
+    'PortfolioAssets',
     {
         id: {
             type: DataTypes.INTEGER.UNSIGNED,
@@ -19,21 +22,27 @@ const User = sequelise.define(
             unique: true,
             primaryKey: true,
         },
-
-        username: {
+        portfolio_id: {
+                    type: DataTypes.INTEGER.UNSIGNED,
+                    references: {
+                        model: Portfolio,
+                        key: 'id'
+                    }
+                },
+        ticker: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        password: {
-            type: DataTypes.STRING,
+        quantity: {
+            type: DataTypes.INTEGER,
             allowNull: false
-        }
+        },
     },
     {
-        tablename: 'users',
+        tablename: 'portfolioAssets',
         timestamps: false,
     }
 )
 
 
-// module.exports = {User};
+// module.exports = {addAsset, listAllAssets};
