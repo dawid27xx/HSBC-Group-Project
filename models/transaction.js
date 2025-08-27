@@ -30,7 +30,7 @@ const Transaction = sequelise.define(
                         key: 'id'
                     }
                 },
-        pa_id: {
+        portfolio_asset_id: {
                     type: DataTypes.INTEGER.UNSIGNED,
                     references: {
                         model: PortfolioAsset,
