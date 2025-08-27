@@ -76,7 +76,7 @@ async function addTransaction(user_id, portfolio_asset_id, transaction_type, qua
             quantity: quantity,
             datetime: datetime
         })
-        console.log("Transaction Added", newTransaction.insertedId)
+        console.log("Transaction Added", newTransaction)
     } catch (err) {
         console.log(err);
     }

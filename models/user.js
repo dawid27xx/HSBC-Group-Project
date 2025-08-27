@@ -52,7 +52,7 @@ async function addUser(username, password) {
             username: username,
             password: password
         })
-        console.log("User Added", newUser.insertedId)
+        console.log("User Added", newUser)
     } catch (err) {
         console.log(err);
     }

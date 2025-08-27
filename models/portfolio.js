@@ -52,7 +52,7 @@ async function addPortfolio(name, exchange) {
             name: name,
             exchange: exchange
         })
-        console.log("Portfolio Added", newPortfolio.insertedId)
+        console.log("Portfolio Added", newPortfolio)
     } catch (err) {
         console.log(err);
     }

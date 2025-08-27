@@ -60,7 +60,7 @@ async function addUserPortfolio(user_id, portfolio_id) {
             portfolio_id: portfolio_id,
             user_id: user_id
         })
-        console.log("UserPortfolio Added", newUserPortfolio.insertedId)
+        console.log("UserPortfolio Added", newUserPortfolio)
     } catch (err) {
         console.log(err);
     }
