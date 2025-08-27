@@ -21,18 +21,18 @@ const Transaction = sequelise.define(
         },
 
         user_id: {
-                    type: DataTypes.INTEGER.UNSIGNED,
-                    references: {
-                        model: 'user',
-                        key: 'id'
-                    }
+            type: DataTypes.INTEGER.UNSIGNED,
+            references: {
+                model: 'user',
+                key: 'id'
+            }
                 },
         portfolio_asset_id: {
-                    type: DataTypes.INTEGER.UNSIGNED,
-                    references: {
-                        model: 'portfolioasset',
-                        key: 'id'
-                    }
+            type: DataTypes.INTEGER.UNSIGNED,
+            references: {
+                model: 'portfolioasset',
+                key: 'id'
+            }
                 },
         transaction_type: {
             type: DataTypes.STRING,
@@ -44,7 +44,8 @@ const Transaction = sequelise.define(
         },
         datetime: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: false,
+            defaultValue: DataTypes.NOW
         }
     },
     {
@@ -64,14 +65,13 @@ async function listAllTransactions() {
 
 // change this when Asset contains more attributes
 // delete if we are to add assets manually
-async function addTransaction(user_id, portfolio_asset_id, transaction_type, quantity, datetime) {
+async function addTransaction(user_id, portfolio_asset_id, transaction_type, quantity) {
     try {
         const newTransaction = await Transaction.create({
             user_id: user_id,
             portfolio_asset_id: portfolio_asset_id,
             transaction_type: transaction_type,
-            quantity: quantity,
-            datetime: datetime
+            quantity: quantity
         })
         console.log("Transaction Added", newTransaction)
     } catch (err) {

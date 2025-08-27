@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const userController = require('../controllers/userController');
+const transactionController = require('../controllers/transactionController');
 
 // this publishes the controller functions as endpoints you can call
-router.get("/users", userController.listAllUsers);
-router.post("/users", userController.addUsers);
+router.get("/transaction", transactionController.listAllTransactions);
+router.post("/transaction", transactionController.addTransactions);
 
 module.exports = router;
