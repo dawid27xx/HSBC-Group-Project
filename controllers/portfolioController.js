@@ -1,4 +1,3 @@
-const { name } = require('xml-name-validator');
 const Portfolio = require('../models/portfolio');
 
 

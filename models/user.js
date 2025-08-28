@@ -44,19 +44,37 @@ async function listAllUsers() {
     }
 }
 
+async function listUser(username, password) {
+    try {
+        const users = await User.findOne({ where: { username: username, password: password } });
+        if (users) {
+            return { status: "authorised", id: users.id, username: users.username };
+        } else{
+            return { status: "fail" };
+        };
+    } catch (err) {
+        console.log(err);
+    };
+}
+
 // change this when Asset contains more attributes
 // delete if we are to add assets manually
 async function addUser(username, password) {
     try {
+        const existingUsers = await User.findOne({ where: { username: username } });
+        if (existingUsers){
+            return "user_exists";
+        }
         const newUser = await User.create({
             username: username,
             password: password
-        })
-        console.log("User Added", newUser)
+        });
+        console.log(`User with username ${username} added `);
+        return "success";
     } catch (err) {
         console.log(err);
     }
 }
 
 
-module.exports = {listAllUsers, addUser};
+module.exports = {listAllUsers, listUser, addUser};
