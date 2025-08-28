@@ -4,8 +4,8 @@ Project Description: [https://bitbucket.org/neuedamats/portfoliomanager/src/mast
 
 ## Endpoints
 - GET:
-    - `/portfolio/:userId` - retrieve all portfolios for a given user.
-    - `/assets/:portfolioId` - retrieve all assets in a given portfolio.
+    - `/portfolio/` - retrieve all portfolios for a given user.
+    - `/portfolio/asset` - retrieve all assets in a given portfolio.
     - `/transactions/:userId` - retrieve all transactions for a given user. 
     - `/transactions/:portfolioId` - retrieve all transactions relating to a given portfolio.
     - `/transactions/:portfolioAssetId` - retrieve all transactions relating to a given asset in a portfolio.
@@ -13,12 +13,12 @@ Project Description: [https://bitbucket.org/neuedamats/portfoliomanager/src/mast
     - `/auth/register` - create a user profile.
     - `/auth/login` - sign in to a user profile.
     - `/portfolio` - create a new portfolio.
-    - `/asset` - add a new asset to a portfolio.
+    - `/portfolio/asset` - add a new asset to a portfolio.
     - `/transaction` - add a new transaction relating to a portfolio asset.
 - PATCH:
     - `/portfolio` - update the name of a user portfolio.
-    - `/asset` - update the quantity of a given asset.
+    - `/portfolio/asset` - update the quantity of a given asset.
 - DELETE:
     - `/auth/user` - delete a user profile.
     - `/portfolio` - delete a portfolio.
-    - `/asset` - delete an asset from a portfolio.
+    - `/portfolio/asset` - delete an asset from a portfolio.
