@@ -47,12 +47,21 @@ async function validateLogin(req, res) {
         if (!username || !password) {
             res.status(400).json({error: "You must enter a username and a password to login."});
         }
-        const validateUser = await user.listUser(username, password);
-        console.log(validateUser);
-        if (validateUser.status === "authorised") {
-            const payload = {id: validateUser.id, username: validateUser.username};
-            const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-            res.status(200).json({ success: true, message: "Login successful.", token: token });
+        
+        const validateUser = await user.listUser(username);
+        console.log(validateUser.match)
+        if (validateUser.match === true) {
+            bcrypt.compare(password, validateUser.saltedHash, function(err, result) {
+                if (result) {
+                    const payload = {id: validateUser.id, username: validateUser.username};
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+                    res.status(200).json({ success: true, message: "Login successful.", token: token });
+                }
+                else {
+                    console.log("here");
+                    res.status(401).json({ success: false, message: "Unauthorised credentials." });
+                }
+            });
         } else {
             res.status(401).json({ success: false, message: "Unauthorised credentials." });
         }
