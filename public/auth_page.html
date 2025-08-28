@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login or Register - Portfolio Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container vh-100 d-flex justify-content-center align-items-center">
+        <div class="row w-100">
+            <!-- Login Section -->
+            <div class="col-md-6">
+                <div class="card p-4 shadow">
+                    <h1 class="text-center text-primary mb-4">Login</h1>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="loginUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="loginUsername" placeholder="Enter your username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Register Section -->
+            <div class="col-md-6">
+                <div class="card p-4 shadow">
+                    <h1 class="text-center text-success mb-4">Register</h1>
+                    <form id="registerForm" action="register.html">
+                        <div class="mb-3">
+                            <label for="registerUsername" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="registerUsername" placeholder="Choose a username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registerPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Choose a password" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            }).then(response => {
+                console.log("raw response ", response);
+                if (!response.ok) {
+                    console.log(response);
+                    // If the response status is not 200-299, throw an error
+                    throw new Error('Login failed. Please check your credentials.');
+                }
+                return response.json(); // Parse the JSON response
+            })
+            .then(data => {
+                // Handle success based on the server's response
+                if (data.success) {
+                    alert('Login successful! Redirecting...');
+                    window.location.href = '/index.html'; // Redirect to the dashboard or another page
+                } else {
+                    alert('Login failed: ' + (data.message || 'Unknown error.'));
+                }
+            })
+            .catch(error => {
+                // Handle network or other errors
+                alert('An error occurred: ' + error.message);
+            });
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Here you would typically handle registration
+            alert('Registration functionality is not implemented in this demo.');
+        });
+    </script>
+</body> 
+</html>

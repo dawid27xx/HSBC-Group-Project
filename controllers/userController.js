@@ -41,7 +41,7 @@ async function validateLogin(req, res) {
         if (validateUser.status === "authorised") {
             const payload = {id: validateUser.id, username: validateUser.username};
             const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-            res.status(200).json({ message: "Login successful.", token: token });
+            res.status(200).json({ success: true, message: "Login successful.", token: token });
         } else {
             res.status(401).json({ message: "Unauthorised credentials." });
         }
