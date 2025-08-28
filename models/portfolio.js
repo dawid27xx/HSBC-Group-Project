@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const UserPortfolio = require('./userPortfolio');
-const PortfolioAsset = require('./portfolioAsset')
+const PortfolioAsset = require('./portfolioAsset');
+const Transaction = require('./transaction');
 require('dotenv').config({path: './.env'});
 
 
@@ -44,6 +45,50 @@ async function listAllPortfolios() {
     } catch (err) {
         console.log(err);
     }
+}
+
+async function buySellOrder(portfolio_id, ticker, transaction_type, quantity) {
+    let orderFulfilled = 0;
+    try {
+        const portfolioAsset = await PortfolioAsset.PortfolioAsset.findOne({
+            where: {portfolio_id: portfolio_id, ticker: ticker}
+        })
+        
+        if (transaction_type.toLowerCase() == 'sell') {
+            let currQuantity = portfolioAsset.quantity;
+            if (quantity > currQuantity) {
+                return "Cannot Sell More Than Owned."
+            } else {
+                portfolioAsset.quantity = currQuantity - quantity;
+                await portfolioAsset.save();
+                orderFulfilled = 1;
+            }
+        } else if (transaction_type.toLowerCase() == 'buy') {
+            let currQuantity = portfolioAsset.quantity;
+            portfolioAsset.quantity = currQuantity + quantity;
+            await portfolioAsset.save();
+            orderFulfilled = 1;
+        } else {
+            return "Invalid Order Type";
+        }
+
+        if (orderFulfilled) {
+            let userId = 1;
+            try {
+                const newTransactionlog = await Transaction.addTransaction(userId, portfolio_id ,portfolioAsset.id, transaction_type, quantity);
+                console.log("Transaction log created.")
+                return "Buy/Sell Order Success."
+            } catch (err) {
+                console.log("Error creating transaction log.")
+            }
+        } else {
+            return "Order not Fulfilled."
+        }
+
+    } catch (err) {
+        console.log("Error Carrying out buy/sell order")
+    }
+
 }
 
 async function getAssetsInPortfolio(portfolio_id) {
@@ -111,4 +156,4 @@ async function addPortfolio(name, exchange) {
 }
 
 
-module.exports = {addPortfolio, addAssetToPortfolio, getAssetsInPortfolio, listAllPortfolios, listAllPortfoliosCurrentUser};
+module.exports = {addPortfolio, buySellOrder, addAssetToPortfolio, getAssetsInPortfolio, listAllPortfolios, listAllPortfoliosCurrentUser};

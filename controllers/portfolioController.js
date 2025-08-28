@@ -32,6 +32,16 @@ async function getAssetsInPortfolio(req, res) {
     }
 }
 
+async function buySellOrder(req, res) {
+    try {
+        const { portfolio_id, ticker, transaction_type, quantity} = req.body;
+        const buySellOrder = await Portfolio.buySellOrder(portfolio_id, ticker, transaction_type, quantity);
+        res.status(200).send(buySellOrder);
+    } catch (err) {
+        res.status(500).json({error: "Buy/Sell Order Failed."})
+    }
+}
+
 async function addAssetToPortfolio(req, res) {
     try {
         const { portfolio_id, ticker, quantity } = req.body;
@@ -59,4 +69,4 @@ async function addPortfolios(req, res) {
     }
 }
 
-module.exports = {listAllPortfolios, addAssetToPortfolio, addPortfolios, listAllPortfoliosCurrentUser, getAssetsInPortfolio};
+module.exports = {listAllPortfolios, buySellOrder, addAssetToPortfolio, addPortfolios, listAllPortfoliosCurrentUser, getAssetsInPortfolio};
