@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const UserPortfolio = require('./userPortfolio');
+const PortfolioAsset = require('./portfolioAsset')
 require('dotenv').config({path: './.env'});
 
 
@@ -42,6 +43,27 @@ async function listAllPortfolios() {
         return portfolios;
     } catch (err) {
         console.log(err);
+    }
+}
+
+async function getAssetsInPortfolio(portfolio_id) {
+    try {
+        const assets = await PortfolioAsset.PortfolioAsset.findAll({
+            where: {portfolio_id: portfolio_id}
+        })
+        return assets
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function addAssetToPortfolio(portfolio_id, ticker, quantity) {
+    try {
+        const newAssetToPortfolio = await PortfolioAsset.addPortfolioAsset(portfolio_id, ticker, quantity);
+        console.log("New Asset Added");
+        return newAssetToPortfolio
+    } catch (err) {
+        console.log("Failed to add Asset");
     }
 }
 
@@ -89,4 +111,4 @@ async function addPortfolio(name, exchange) {
 }
 
 
-module.exports = {addPortfolio, listAllPortfolios, listAllPortfoliosCurrentUser};
+module.exports = {addPortfolio, addAssetToPortfolio, getAssetsInPortfolio, listAllPortfolios, listAllPortfoliosCurrentUser};

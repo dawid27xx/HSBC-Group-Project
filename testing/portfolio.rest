@@ -6,5 +6,17 @@
 #     "exchange": "LSEG"
 # }
 
-GET http://localhost:3000/portfolio/portfolio HTTP/1.1
-Content-Type: application/json
+# GET http://localhost:3000/portfolio/portfolio HTTP/1.1
+# Content-Type: application/json
+
+# GET http://localhost:3000/portfolio/asset/1 HTTP/1.1
+# Content-Type: application/json
+
+# POST http://localhost:3000/portfolio/asset HTTP/1.1
+# Content-Type: application/json
+
+# {
+#     "portfolio_id": 1,
+#     "ticker": "HSBC",
+#     "quantity": 100
+# }

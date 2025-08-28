@@ -22,6 +22,26 @@ async function listAllPortfoliosCurrentUser(req, res) {
     }
 }
 
+async function getAssetsInPortfolio(req, res) {
+    try {
+        const { portfolio_id } = req.params;
+        const assetsForPortfolio = await Portfolio.getAssetsInPortfolio(portfolio_id);
+        res.status(200).send(assetsForPortfolio);
+    } catch (err) {
+        res.status(500).json({error: "Failed fetching assets in a portfolio."})
+    }
+}
+
+async function addAssetToPortfolio(req, res) {
+    try {
+        const { portfolio_id, ticker, quantity } = req.body;
+        const assetsForPortfolio = await Portfolio.addAssetToPortfolio(portfolio_id, ticker, quantity);
+        res.status(200).send(assetsForPortfolio);
+    } catch (err) {
+        res.status(500).json({error: "Failed adding asset in a portfolio."})
+    }
+}
+
 async function addPortfolios(req, res) {
     try {
         let userId = 1;
@@ -39,4 +59,4 @@ async function addPortfolios(req, res) {
     }
 }
 
-module.exports = {listAllPortfolios, addPortfolios, listAllPortfoliosCurrentUser};
+module.exports = {listAllPortfolios, addAssetToPortfolio, addPortfolios, listAllPortfoliosCurrentUser, getAssetsInPortfolio};

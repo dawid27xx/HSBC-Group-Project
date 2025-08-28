@@ -68,4 +68,4 @@ async function addPortfolioAsset(portfolio_id, ticker, quantity) {
 }
 
 
-module.exports = {addPortfolioAsset, listAllPortfolioAssets};
+module.exports = {PortfolioAsset, addPortfolioAsset, listAllPortfolioAssets};
