@@ -2,6 +2,10 @@
 
 Project Description: [https://bitbucket.org/neuedamats/portfoliomanager/src/master/](https://bitbucket.org/neuedamats/portfoliomanager/src/master/)
 
+## Demo User
+- Username: `user`
+- Password: `1234`
+
 ## Endpoints
 - GET:
     - `/portfolio/` - retrieve all portfolios for a given user. DONE

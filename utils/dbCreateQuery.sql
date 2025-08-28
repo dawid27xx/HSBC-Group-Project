@@ -46,7 +46,7 @@ FOREIGN KEY (portfolio_asset_id) REFERENCES portfolioAssets(id)
 );
 
 INSERT INTO `PortfolioManager`.users (username, password)
-VALUES ("Tim2", "Password");
+VALUES ("user", "$2b$10$XYeL3dVeXlu6afRn3Z89I./qhXZLaYVt/xeRHqEuLSkmZ4Fqqhp9e");
 
 INSERT INTO  `PortfolioManager`.portfolios (name, exchange)
 VALUES ("Tech Stocks", "NASDAQ");
