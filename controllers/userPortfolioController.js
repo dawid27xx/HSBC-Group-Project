@@ -4,10 +4,10 @@ const userPortfolio = require('../models/userPortfolio');
 // these functions use function defined in the model, and make them available to requests by the user
 async function listAllUserPortfolios(req, res) {
     try {
-        const userPortfolio = await userPortfolio.listAllUserPortfolios();
-        res.status(200).send(userPortfolio);
+        const userPortfolios = await userPortfolio.listAllUserPortfolios();
+        res.status(200).send(userPortfolios);
     } catch (err) {
-        res.status(500).json({error: "Failed fetching users."})
+        res.status(500).json({error: "Failed fetching user portfolios."})
     }
 }
 

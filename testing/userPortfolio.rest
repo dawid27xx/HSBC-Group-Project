@@ -6,5 +6,5 @@
 #     "portfolio_id": 1
 # }
 
-GET http://localhost:3000/users/users HTTP/1.1
+GET http://localhost:3000/userPortfolio/userPortfolio HTTP/1.1
 Content-Type: application/json
