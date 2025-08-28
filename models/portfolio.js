@@ -81,7 +81,8 @@ async function addPortfolio(name, exchange) {
             name: name,
             exchange: exchange
         })
-        console.log("Portfolio Added", newPortfolio)
+        console.log("Portfolio Added")
+        return newPortfolio;
     } catch (err) {
         console.log(err);
     }

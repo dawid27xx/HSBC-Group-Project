@@ -1,16 +1,10 @@
-# POST http://localhost:3000/users/users HTTP/1.1
-# Content-Type: application/json
-
-# {
-#     "username": "dave",
-#     "password": "password123"
-# }
-
-GET http://localhost:3000/portfolio/portfolio HTTP/1.1
+POST http://localhost:3000/portfolio/portfolio HTTP/1.1
 Content-Type: application/json
 
-# [
-#   {
-#     "portfolio_id": 1
-#   }
-# ]
+{
+    "name": "Energy Stonks",
+    "exchange": "LSEG"
+}
+
+# GET http://localhost:3000/portfolio/portfolio HTTP/1.1
+# Content-Type: application/json
