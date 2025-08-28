@@ -63,4 +63,4 @@ async function addUserPortfolio(user_id, portfolio_id) {
     }
 }
 
-module.exports = {addUserPortfolio, listAllUserPortfolios};
+module.exports = {UserPortfolio, addUserPortfolio, listAllUserPortfolios};

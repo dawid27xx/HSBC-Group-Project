@@ -12,6 +12,16 @@ async function listAllPortfolios(req, res) {
     }
 }
 
+async function listAllPortfoliosCurrentUser(req, res) {
+    try {
+        let userId = 1;
+        const portfolios = await Portfolio.listAllPortfoliosCurrentUser(userId);
+        res.status(200).send(portfolios);
+    } catch (err) {
+        res.status(500).json({error: "Failed fetching portfolios."})
+    }
+}
+
 async function addPortfolios(req, res) {
     try {
         const { name, exchange } = req.body;
@@ -25,4 +35,4 @@ async function addPortfolios(req, res) {
     }
 }
 
-module.exports = {listAllPortfolios, addPortfolios};
+module.exports = {listAllPortfolios, addPortfolios, listAllPortfoliosCurrentUser};

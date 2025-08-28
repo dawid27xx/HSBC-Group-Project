@@ -1,4 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
+const UserPortfolio = require('./userPortfolio');
 require('dotenv').config({path: './.env'});
 
 
@@ -44,6 +45,34 @@ async function listAllPortfolios() {
     }
 }
 
+async function listAllPortfoliosCurrentUser(userId) {
+    try {
+        var portfolios = [];
+        const userPortfoliosId = await UserPortfolio.UserPortfolio.findAll({
+            attributes: ['portfolio_id'],
+            where: { user_id: userId },
+        });
+        for (const idObject of userPortfoliosId) {
+            const portfolio = await Portfolio.findOne({ 
+                where: { id: idObject.portfolio_id }
+            });
+            
+            let portfolioObject = {
+                id: portfolio.id,
+                name: portfolio.name,
+                exchange: portfolio.exchange
+            };
+            console.log(portfolioObject);
+            portfolios.push(portfolioObject);
+        }
+
+        return portfolios;
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 // change this when Asset contains more attributes
 // delete if we are to add assets manually
 async function addPortfolio(name, exchange) {
@@ -59,4 +88,4 @@ async function addPortfolio(name, exchange) {
 }
 
 
-module.exports = {addPortfolio, listAllPortfolios};
+module.exports = {addPortfolio, listAllPortfolios, listAllPortfoliosCurrentUser};
