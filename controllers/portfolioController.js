@@ -1,5 +1,7 @@
 const Portfolio = require('../models/portfolio');
 const UserPortfolio = require('../models/userPortfolio')
+const yf = require('yahoo-finance2').default;
+
 
 
 // these functions use function defined in the model, and make them available to requests by the user
@@ -69,4 +71,49 @@ async function addPortfolios(req, res) {
     }
 }
 
-module.exports = {listAllPortfolios, buySellOrder, addAssetToPortfolio, addPortfolios, listAllPortfoliosCurrentUser, getAssetsInPortfolio};
+async function getPriceOfStock(req, res) {
+    try {
+        const result = await getPrices("MSFT");
+        res.status(200).json({result: result});
+    } catch (err) {
+        res.status(500).json({error: "Error fetching stock price"})
+    }
+}
+
+async function getPrices(ticker) {
+    yf.suppressNotices(['yahooSurvey']);
+    const quote = await yf.quote(ticker);
+    // console.log(quote);
+    const { regularMarketPrice, currency, displayName, symbol } = quote;
+    const stockData = {
+        'price' : regularMarketPrice,
+        'currency' : currency,
+        'displayName' : displayName,
+        'symbol' : symbol
+    }
+    return stockData
+}
+
+
+// get last 2 years
+async function getPricesLastTwoYear(ticker) {
+    yf.suppressNotices(['yahooSurvey']);
+    const quote = await yf.chart(ticker,
+        { period1: "2023-08-01", period2: "2025-08-01", interval: "1mo" }
+    );
+    const { quotes } = quote;
+    let dates = [];
+    let closes = []
+
+    quotes.forEach((q) => {
+        dates.push(q.date);
+        closes.push(q.close);
+    })
+
+    result = [dates, closes];
+
+    return result;
+    
+}
+
+module.exports = {getPrices, getPricesLastTwoYear, listAllPortfolios, buySellOrder, addAssetToPortfolio, addPortfolios, listAllPortfoliosCurrentUser, getAssetsInPortfolio, getPrices};
