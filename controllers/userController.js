@@ -21,12 +21,12 @@ async function addUser(req, res) {
         }
         const addUser = await user.addUser(username, password);
         if (addUser === "user_exists") {
-            return res.status(401).json({ message: "Username already in use - please try another." });
+            return res.status(401).json({ success: false, message: "Username already in use - please try another." });
         } else {
-            return res.status(200).json(addUser);
+            return res.status(200).json( { success: true, message: "User registered successfully." } );
         }
     } catch (err) {
-        res.status(500).json({error: "Failed to add user.", trace: err});
+        res.status(500).json({ success: false, error: "Failed to add user.", trace: err});
     }
 }
 
@@ -43,11 +43,11 @@ async function validateLogin(req, res) {
             const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
             res.status(200).json({ success: true, message: "Login successful.", token: token });
         } else {
-            res.status(401).json({ message: "Unauthorised credentials." });
+            res.status(401).json({ success: false, message: "Unauthorised credentials." });
         }
         
     } catch (err) {
-        res.status(500).json({error: "Failed to login.", trace: err});
+        res.status(500).json({success: false, error: "Failed to login.", trace: err});
     }
 }
 
