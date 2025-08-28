@@ -58,7 +58,6 @@ async function validateLogin(req, res) {
                     res.status(200).json({ success: true, message: "Login successful.", token: token });
                 }
                 else {
-                    console.log("here");
                     res.status(401).json({ success: false, message: "Unauthorised credentials." });
                 }
             });
