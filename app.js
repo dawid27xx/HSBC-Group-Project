@@ -8,6 +8,7 @@ const transactionRoutes = require('./routes/transactionRoutes')
 const userPortfolio = require('./routes/userPortfolioRoutes')
 
 app.use(express.json());
+app.use(express.static('public'));
 
 app.use('/auth', userRoutes);
 app.use('/portfolio', portfolioRoutes);
