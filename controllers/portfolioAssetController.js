@@ -11,6 +11,16 @@ async function listAllPortfolioAssets(req, res) {
     }
 }
 
+async function deletePortfolioAsset(req, res) {
+    try {
+        const {portfolio_asset_id} = req.params;
+        const portfolioAssetToDelete = await PortfolioAsset.deletePortfolioAsset(portfolio_asset_id);
+        res.status(200).send("Asset Deleted");
+    } catch (err) {
+        res.status(500).json({error: "Failed Deleting an asset."})
+    }
+}
+
 async function addPortfolioAssets(req, res) {
     try {
         const { portfolio_id, ticker, quantity } = req.body;
@@ -24,4 +34,4 @@ async function addPortfolioAssets(req, res) {
     }
 }
 
-module.exports = {listAllPortfolioAssets, addPortfolioAssets};
+module.exports = {listAllPortfolioAssets, addPortfolioAssets, deletePortfolioAsset};

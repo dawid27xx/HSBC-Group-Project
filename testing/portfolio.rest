@@ -28,7 +28,7 @@ Content-Type: application/json
 
 {
     "portfolio_id": 1,
-    "ticker": "HSBC",
-    "transaction_type": "buy",
-    "quantity": 95
+    "ticker": "DEF",
+    "transaction_type": "sell",
+    "quantity": 10
 }

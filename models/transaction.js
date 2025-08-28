@@ -70,6 +70,32 @@ async function listAllTransactions() {
     }
 }
 
+async function listAllTransactionsCurrentUser(user_id) {
+    try {
+        const transactions = await Transaction.findAll({
+            where: {user_id: user_id}
+        })
+        return transactions
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+async function deleteAllByPortfolioAssetId(portfolio_asset_id) {
+    try {
+        console.log("Here in deleteTrans")
+
+        await Transaction.destroy({
+            where: {
+              portfolio_asset_id: portfolio_asset_id,
+            },
+          });
+        console.log("Transactions deleted.")
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 // change this when Asset contains more attributes
 // delete if we are to add assets manually
 async function addTransaction(user_id, portfolio_id, portfolio_asset_id, transaction_type, quantity) {
@@ -89,4 +115,4 @@ async function addTransaction(user_id, portfolio_id, portfolio_asset_id, transac
 }
 
 
-module.exports = {addTransaction, listAllTransactions};
+module.exports = {Transaction, addTransaction, deleteAllByPortfolioAssetId, listAllTransactionsCurrentUser, listAllTransactions};

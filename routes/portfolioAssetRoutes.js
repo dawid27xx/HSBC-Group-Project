@@ -6,5 +6,6 @@ const portfolioAssetController = require('../controllers/portfolioAssetControlle
 // this publishes the controller functions as endpoints you can call
 router.get("/portfolioAsset", portfolioAssetController.listAllPortfolioAssets);
 router.post("/portfolioAsset", portfolioAssetController.addPortfolioAssets);
+router.delete("/portfolioAsset/:portfolio_asset_id", portfolioAssetController.deletePortfolioAsset);
 
 module.exports = router;

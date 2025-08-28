@@ -49,16 +49,28 @@ async function listAllPortfolios() {
 
 async function buySellOrder(portfolio_id, ticker, transaction_type, quantity) {
     let orderFulfilled = 0;
+    let sellOffOrder = 0;
     try {
         const portfolioAsset = await PortfolioAsset.PortfolioAsset.findOne({
             where: {portfolio_id: portfolio_id, ticker: ticker}
         })
+
+        const portfolioAssetid = portfolioAsset.id
         
         if (transaction_type.toLowerCase() == 'sell') {
             let currQuantity = portfolioAsset.quantity;
             if (quantity > currQuantity) {
                 return "Cannot Sell More Than Owned."
-            } else {
+            } else if (quantity == currQuantity) {
+                try {
+                    const portfolioAsset = await PortfolioAsset.deletePortfolioAsset(portfolioAssetid)
+                    orderFulfilled = 1;
+                    sellOffOrder = 1;
+                } catch (err) {
+                    console.log(err);
+                }
+            } 
+            else {
                 portfolioAsset.quantity = currQuantity - quantity;
                 await portfolioAsset.save();
                 orderFulfilled = 1;
@@ -72,7 +84,7 @@ async function buySellOrder(portfolio_id, ticker, transaction_type, quantity) {
             return "Invalid Order Type";
         }
 
-        if (orderFulfilled) {
+        if (orderFulfilled && !sellOffOrder) {
             let userId = 1;
             try {
                 const newTransactionlog = await Transaction.addTransaction(userId, portfolio_id ,portfolioAsset.id, transaction_type, quantity);
@@ -81,8 +93,10 @@ async function buySellOrder(portfolio_id, ticker, transaction_type, quantity) {
             } catch (err) {
                 console.log("Error creating transaction log.")
             }
+        } else if (orderFulfilled && sellOffOrder){
+            return "Sell off Success."
         } else {
-            return "Order not Fulfilled."
+            return "Order not fullfilled."
         }
 
     } catch (err) {

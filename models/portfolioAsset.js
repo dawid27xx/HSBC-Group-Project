@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config({path: './.env'});
+const Transaction = require('./transaction')
 
 
 // creates a sequelize connection
@@ -51,15 +52,36 @@ async function listAllPortfolioAssets() {
     }
 }
 
+async function deletePortfolioAsset(portfolio_asset_id) {
+    try {
+
+        // must delete all transaction first
+        console.log("Here")
+        const checkIfTransacionsToDelete = await Transaction.Transaction.findAll({where: {portfolio_asset_id: portfolio_asset_id}});
+        if (checkIfTransacionsToDelete) {
+            const transactionsToDelete = await Transaction.deleteAllByPortfolioAssetId(portfolio_asset_id);
+        }
+        console.log("Here Here")
+
+        const portfolioAssetToDelete = await PortfolioAsset.findOne({where: {id: portfolio_asset_id}});
+        await portfolioAssetToDelete.destroy();
+        return 'Deleted';
+    } catch (err) {
+        console.log(err)
+    }
+}
+
 // change this when Asset contains more attributes
 // delete if we are to add assets manually
 async function addPortfolioAsset(portfolio_id, ticker, quantity) {
+    let user_id = 1;
     try {
         const newPortfolioAsset = await PortfolioAsset.create({
             portfolio_id: portfolio_id,
             ticker: ticker,
             quantity: quantity
         })
+        const newTransaction = await Transaction.addTransaction(user_id, portfolio_id, newPortfolioAsset.id, "buy", quantity);
         console.log("PortfolioAsset Added")
         return newPortfolioAsset
     } catch (err) {
@@ -68,4 +90,4 @@ async function addPortfolioAsset(portfolio_id, ticker, quantity) {
 }
 
 
-module.exports = {PortfolioAsset, addPortfolioAsset, listAllPortfolioAssets};
+module.exports = {PortfolioAsset, deletePortfolioAsset, addPortfolioAsset, listAllPortfolioAssets};

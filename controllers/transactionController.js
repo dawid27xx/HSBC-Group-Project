@@ -7,9 +7,44 @@ async function listAllTransactions(req, res) {
         const transactions = await Transaction.listAllTransactions();
         res.status(200).send(transactions);
     } catch (err) {
-        res.status(500).json({error: "Failed fetching portfolios."})
+        res.status(500).json({error: "Failed fetching transactions."})
     }
 }
+
+async function listAllTransactionsCurrentUser(req, res) {
+    try {
+        let userId = 1;
+        const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
+        res.status(200).send(transactions);
+    } catch (err) {
+        res.status(500).json({error: "Failed fetching transactions for current user"})
+    }
+}
+
+async function listAllTransactionsPortfolio(req, res) {
+    try {
+        let userId = 1;
+        const { portfolio_id } = req.params;
+        const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
+        const transactionsByPortfolio = transactions.filter((t) => t.portfolio_id == portfolio_id);
+        res.status(200).send(transactionsByPortfolio);
+    } catch (err) {
+        res.status(500).json({error: "Failed fetching transactions for current user"})
+    }
+}
+async function listAllTransactionsPortfolioAsset(req, res) {
+    try {
+        let userId = 1;
+        const { portfolio_asset_id } = req.params;
+        const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
+        const transactionsByPortfolio = transactions.filter((t) => t.portfolio_asset_id == portfolio_asset_id);
+        res.status(200).send(transactionsByPortfolio);
+    } catch (err) {
+        res.status(500).json({error: "Failed fetching transactions for current user"})
+    }
+}
+
+
 // user_id, portfolio_asset_id, transaction_type, quantity, datetime
 async function addTransactions(req, res) {
     try {
@@ -24,4 +59,4 @@ async function addTransactions(req, res) {
     }
 }
 
-module.exports = {listAllTransactions, addTransactions};
+module.exports = {listAllTransactions, listAllTransactionsPortfolioAsset, listAllTransactionsPortfolio, addTransactions, listAllTransactionsCurrentUser};
