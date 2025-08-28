@@ -44,13 +44,13 @@ async function listAllUsers() {
     }
 }
 
-async function listUser(username, password) {
+async function listUser(username) {
     try {
-        const users = await User.findOne({ where: { username: username, password: password } });
+        const users = await User.findOne({ where: { username: username } });
         if (users) {
-            return { status: "authorised", id: users.id, username: users.username };
+            return { match: true, id: users.id, username: users.username, saltedHash: users.password };
         } else{
-            return { status: "fail" };
+            return { match: false };
         };
     } catch (err) {
         console.log(err);
