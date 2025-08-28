@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "portfolio_id": 1,
-    "ticker": "DEF",
+    "ticker": "AAPL",
     "quantity": 10
 }
 
