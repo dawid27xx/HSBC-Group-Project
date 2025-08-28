@@ -43,6 +43,7 @@ const UserPortfolio = sequelise.define(
 async function listAllUserPortfolios() {
     try {
         const UserPortfolios = await UserPortfolio.findAll();
+        console.log(UserPortfolios);
         return UserPortfolios;
     } catch (err) {
         console.log(err);
@@ -57,7 +58,8 @@ async function addUserPortfolio(user_id, portfolio_id) {
             portfolio_id: portfolio_id,
             user_id: user_id
         })
-        console.log("UserPortfolio Added", newUserPortfolio)
+        console.log("UserPortfolio Added")
+        return newUserPortfolio
     } catch (err) {
         console.log(err);
     }

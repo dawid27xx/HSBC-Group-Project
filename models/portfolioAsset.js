@@ -60,7 +60,8 @@ async function addPortfolioAsset(portfolio_id, ticker, quantity) {
             ticker: ticker,
             quantity: quantity
         })
-        console.log("PortfolioAsset Added", newPortfolioAsset)
+        console.log("PortfolioAsset Added")
+        return newPortfolioAsset
     } catch (err) {
         console.log(err);
     }

@@ -52,7 +52,8 @@ async function addUser(username, password) {
             username: username,
             password: password
         })
-        console.log("User Added", newUser)
+        console.log("User Added")
+        return newUser;
     } catch (err) {
         console.log(err);
     }
