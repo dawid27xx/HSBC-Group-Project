@@ -56,12 +56,12 @@ async function deletePortfolioAsset(portfolio_asset_id) {
     try {
 
         // must delete all transaction first
-        console.log("Here")
+
         const checkIfTransacionsToDelete = await Transaction.Transaction.findAll({where: {portfolio_asset_id: portfolio_asset_id}});
         if (checkIfTransacionsToDelete) {
             const transactionsToDelete = await Transaction.deleteAllByPortfolioAssetId(portfolio_asset_id);
         }
-        console.log("Here Here")
+
 
         const portfolioAssetToDelete = await PortfolioAsset.findOne({where: {id: portfolio_asset_id}});
         await portfolioAssetToDelete.destroy();
