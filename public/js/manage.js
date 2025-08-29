@@ -1,9 +1,7 @@
-const jwt = require('jsonwebtoken');
-
 const token = localStorage.getItem('token');
 if (token) {
     try {
-        const payload = jwt.decode(token);
+        const payload = jwt_decode(token);
         if (payload.username) {
             document.getElementById('username').textContent = payload.username;
         }
