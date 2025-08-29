@@ -37,10 +37,15 @@ async function getAssetsInPortfolio(req, res) {
 async function buySellOrder(req, res) {
     try {
         const { portfolio_id, ticker, transaction_type, quantity} = req.body;
+        console.log(portfolio_id, ticker, transaction_type, quantity);
         const buySellOrder = await Portfolio.buySellOrder(portfolio_id, ticker, transaction_type, quantity);
-        res.status(200).send(buySellOrder);
+        if (buySellOrder){
+            res.status(200).json({ success: true, message: "Transaction completed successfully." });
+        } else {
+            res.status(500).json({ success: false, error: "Buy/Sell Order Failed."});
+        }
     } catch (err) {
-        res.status(500).json({error: "Buy/Sell Order Failed."})
+        res.status(500).json({ success: false, error: "Buy/Sell Order Failed."});
     }
 }
 
@@ -48,9 +53,14 @@ async function addAssetToPortfolio(req, res) {
     try {
         const { portfolio_id, ticker, quantity } = req.body;
         const assetsForPortfolio = await Portfolio.addAssetToPortfolio(portfolio_id, ticker, quantity);
-        res.status(200).send(assetsForPortfolio);
+        if (assetsForPortfolio) {
+            res.status(200).json({ success: true, message: "Asset added successfully" });
+        } else {
+            res.status(500).json({ success: false, error: "Failed adding asset in a portfolio." })
+        }
+       
     } catch (err) {
-        res.status(500).json({error: "Failed adding asset in a portfolio."})
+        res.status(500).json({ success: false, error: "Failed adding asset in a portfolio." })
     }
 }
 

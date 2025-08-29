@@ -150,7 +150,11 @@
         const portfolioNames = {};
 
         // Fetch the portfolio IDs and names for the user
-        fetch('userPortfolio/userPortfolio')
+        fetch('userPortfolio/userPortfolio', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 data.forEach(pa => {
@@ -162,7 +166,11 @@
 
         // Fetch portfolio details like name and exchange
         const fetchPortfolioDetails = () => {
-            fetch(`/portfolio/portfolio`)
+            fetch(`/portfolio/portfolio`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     data.forEach((portfolio) => {
@@ -176,7 +184,11 @@
 
         // Fetch portfolio data by portfolioId and update the chart
         const fetchPortfolioData = (portfolioId, index) => {
-            fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
+            fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.dates && data.values) {
@@ -246,9 +258,14 @@
         };
 
         // Populate the Portfolio Table
+        // Populate the Portfolio Table
         const table = document.getElementById('portfolioTable').getElementsByTagName('tbody')[0];
 
-        fetch(`/portfolio/portfolio`)
+        fetch(`/portfolio/portfolio`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 data.forEach((p) => {
@@ -256,9 +273,12 @@
                     const pName = newRow.insertCell(0);
                     const pExchange = newRow.insertCell(1);
                     const manageButton = newRow.insertCell(2);
+
                     pName.innerHTML = p.name;
                     pExchange.innerHTML = p.exchange;
-                    manageButton.innerHTML = '<button class="btn btn-outline-dark">Manage</button>';
+                    // Set up the manage button with an onClick event
+                    manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${p.id}, '${p.name}', '${p.exchange}')">Manage</button>
+`;
                 });
             });
 
@@ -291,6 +311,20 @@
             dateTime.innerHTML = date;
         });
     });
+        
+// Function to handle the Manage button click
+function managePortfolio(id, name, exchange) {
+    // Store the portfolio ID in localStorage
+    localStorage.setItem('portfolioId', id);
+    localStorage.setItem('portfolioName', name);
+    localStorage.setItem('portfolioExchange', exchange);
+    // Redirect to manage.html
+    window.location.href = 'manage.html';
+}
+
+        
+
+        
     </script>
 </body>
 </html>
