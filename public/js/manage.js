@@ -14,9 +14,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (!portfolioId) {
-        alert("Portfolio ID not found! Please go back.");
-        window.location.href = '/index.html'; // Redirect if no portfolio ID found
-        return;
+        alert('Error fetching portfolio.');
+        window.location.href = '/index.html';
+    } 
+    
+    if (portfolioName) {
+        document.getElementById('portfolioName').textContent = portfolioName;
+    }
+
+    if (portfolioExchange) {
+        document.getElementById('portfolioExchange').textContent = portfolioExchange;
     }
 
     // Fetch the cumulative portfolio data for the line chart
@@ -161,18 +168,7 @@ const portfolioId = localStorage.getItem('portfolioId');
 const portfolioName = localStorage.getItem('portfolioName');
 const portfolioExchange = localStorage.getItem('portfolioExchange');
 
-if (!portfolioId) {
-    alert('Error fetching portfolio.');
-    window.location.href = '/index.html';
-} 
 
-if (portfolioName) {
-    document.getElementById('portfolioName').textContent = portfolioName;
-}
-
-if (portfolioExchange) {
-    document.getElementById('portfolioExchange').textContent = portfolioExchange;
-}
 
 // document.getElementById('registerForm').addEventListener('submit', function(event) {
 //     event.preventDefault();
