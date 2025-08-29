@@ -13,7 +13,7 @@ async function listAllTransactions(req, res) {
 
 async function listAllTransactionsCurrentUser(req, res) {
     try {
-        let userId = 1;
+        let userId = req.user.id;
         const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
         res.status(200).send(transactions);
     } catch (err) {
@@ -23,7 +23,7 @@ async function listAllTransactionsCurrentUser(req, res) {
 
 async function listAllTransactionsPortfolio(req, res) {
     try {
-        let userId = 1;
+        let userId = req.user.id;
         const { portfolio_id } = req.params;
         const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
         const transactionsByPortfolio = transactions.filter((t) => t.portfolio_id == portfolio_id);
@@ -34,7 +34,7 @@ async function listAllTransactionsPortfolio(req, res) {
 }
 async function listAllTransactionsPortfolioAsset(req, res) {
     try {
-        let userId = 1;
+        let userId = req.user.id;
         const { portfolio_asset_id } = req.params;
         const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
         const transactionsByPortfolio = transactions.filter((t) => t.portfolio_asset_id == portfolio_asset_id);

@@ -112,6 +112,8 @@
                 .catch(err => console.error('Error fetching portfolio details:', err));
         };
 
+        console.log(portfolioIds);
+
         // Fetch portfolio data by portfolioId and update the chart
         const fetchPortfolioData = (portfolioId, index) => {
             fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`, {

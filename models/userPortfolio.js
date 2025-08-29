@@ -40,9 +40,11 @@ const UserPortfolio = sequelise.define(
     }
 )
 
-async function listAllUserPortfolios() {
+async function listAllUserPortfolios(userId) {
     try {
-        const UserPortfolios = await UserPortfolio.findAll();
+        const UserPortfolios = await UserPortfolio.findAll({
+            where: {user_id: userId}
+        });
         console.log(UserPortfolios);
         return UserPortfolios;
     } catch (err) {

@@ -47,7 +47,7 @@ async function listAllPortfolios() {
     }
 }
 
-async function buySellOrder(portfolio_id, ticker, transaction_type, quantity) {
+async function buySellOrder(userId, portfolio_id, ticker, transaction_type, quantity) {
     let orderFulfilled = 0;
     let sellOffOrder = 0;
     try {
@@ -85,7 +85,6 @@ async function buySellOrder(portfolio_id, ticker, transaction_type, quantity) {
         }
 
         if (orderFulfilled && !sellOffOrder) {
-            let userId = 1;
             try {
                 const newTransactionlog = await Transaction.addTransaction(userId, portfolio_id ,portfolioAsset.id, transaction_type, quantity);
                 console.log("Transaction log created.")
