@@ -1,10 +1,12 @@
-# POST http://localhost:3000/portfolio/portfolio HTTP/1.1
+# POST http://localhost:3000/portfolio/portfolio
 # Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzU2NDc5NDczLCJleHAiOjE3NTY0ODMwNzN9.uu_i6J-xpVric0aEEMUImjF3eASXhxdWdXEsef_QoaM
 
 # {
 #     "name": "Energy Stonks",
 #     "exchange": "LSEG"
 # }
+
 
 # GET http://localhost:3000/portfolio/portfolio HTTP/1.1
 # Content-Type: application/json
@@ -22,14 +24,14 @@
 # POST http://localhost:3000/portfolio/asset HTTP/1.1
 # Content-Type: application/json
 
-POST http://localhost:3000/portfolio/asset HTTP/1.1
-Content-Type: application/json
+# POST http://localhost:3000/portfolio/asset HTTP/1.1
+# Content-Type: application/json
 
-{
-    "portfolio_id": 1,
-    "ticker": "AAPL",
-    "quantity": 15
-}
+# {
+#     "portfolio_id": 1,
+#     "ticker": "AAPL",
+#     "quantity": 15
+# }
 
 # router.patch("/asset", portfolioController.buySellOrder);
 

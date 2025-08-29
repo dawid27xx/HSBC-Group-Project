@@ -16,7 +16,7 @@ async function listAllPortfolios(req, res) {
 
 async function listAllPortfoliosCurrentUser(req, res) {
     try {
-        let userId = 1;
+        let userId = req.user.id;
         const portfolios = await Portfolio.listAllPortfoliosCurrentUser(userId);
         res.status(200).send(portfolios);
     } catch (err) {
@@ -66,7 +66,7 @@ async function addAssetToPortfolio(req, res) {
 
 async function addPortfolios(req, res) {
     try {
-        let userId = 1;
+        let userId = req.user.id;
         const { name, exchange } = req.body;
         if (!name || !exchange) {
             res.status(400).json({error: "Missing Values"});

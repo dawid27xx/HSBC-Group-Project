@@ -201,6 +201,8 @@
         // Populate the Portfolio Table
         const table = document.getElementById('portfolioTable').getElementsByTagName('tbody')[0];
 
+        console.log(`'Authorization': 'Bearer ' + ${token}`)
+
         fetch(`/portfolio/portfolio`, {
             headers: {
                 'Authorization': 'Bearer ' + token
