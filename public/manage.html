@@ -21,166 +21,233 @@
         <div class="row pb-4" id="pageTitle">
             <h2>Manage Portfolio <strong id="portfolioName">name_here</strong></h2>
         </div>
-        
 
-            <div class="row pb-4 align-items-stretch" id="mainPageContents">
-                <div class="col h-100">
-                    <div class="card border-dark mb-3">
-                        <div class="card-header"><h4>Performance</h4></div>
-                        <main class="container my-4">
-                            <canvas id="cumulativeGrowthChart"></canvas>
-                        </main>
+        <div class="row pb-4 align-items-stretch" id="mainPageContents">
+            <div class="col h-100">
+                <div class="card border-dark mb-3">
+                    <div class="card-header"><h4>Performance</h4></div>
+                    <main class="container my-4">
+                        <canvas id="cumulativeGrowthChart"></canvas>
+                    </main>
+                </div>
 
-                    </div>
+                <div class="container">
+                    <h4>Transaction History</h4>
+                    <table class="table table-striped" id="transactionTable">
+                        <thead>
+                            <tr>
+                                <th>Transaction type</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                    <div class="container">
-                        <h4>Transaction History</h4>
-                        <table class="table table-striped" id="transactionTable">
-                            <thead>
-                                <tr>
-                                    <th>Transaction type</th>
-                                    <th>Quantity</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                
-                            </tbody>
-                            
-                        </table>
+            <div class="col h-100">
+                <div class="card border-dark mb-3">
+                    <div class="card-header"><h4>Asset Make-Up</h4></div>
+                    <div class="card-body">
+                        <canvas id="assetCompositionChart"></canvas>
                     </div>
                 </div>
-                <div class="col h-100">
-                    <div class="card border-dark mb-3">
-                        <div class="card-header"><h4>Asset Make-Up</h4></div>
-                        <div class="card-body">
-                            <p> Figure here </p>
-                        </div>
+                <div class="card border-dark mb-3 mt-4">
+                    <div class="card-header"><h4>Add an Asset</h4></div>
+                    <div class="card-body">
+                        <form id="addAssetForm">
+                            <div class="mb-3">
+                                <label for="addTickerInput" class="form-label">Ticker</label>
+                                <input type="text" class="form-control" id="addTickerInput">
+                            </div>
+                            <div class="mb-3">
+                                <label for="addQuantityInput" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="addQuantityInput">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Asset</button>
+                        </form>
                     </div>
-                    <div class="card border-dark mb-3 mt-4">
-                        <div class="card-header"><h4>Add an Asset</h4></div>
-                        <div class="card-body">
-                            <form id="addAssetForm">
-                                <div class="mb-3">
-                                    <label for="addTickerInput" class="form-label">Ticker</label>
-                                    <input type="text" class="form-control" id="addTickerInput">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="addQuantityInput" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="addQuantityInput">
-                                </div>
-                                <button type="submit" class="btn btn-primary">Add Asset</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="card border-dark mb-3">
-                        <div class="card-header"><h4>Buy and Sell</h4></div>
-                        <div class="card-body">
-                            <form id="transactionForm">
-                                <div class="mb-3">
-                                    <label for="transactionTickerInput" class="form-label">Ticker</label>
-                                    <input type="text" class="form-control" id="transactionTickerInput">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="transactionTypeInput" class="form-label">Transaction Type</label>
-                                    <select class="form-select" id="transactionTypeInput">
-                                        <option value="buy">Buy</option>
-                                        <option value="sell">Sell</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="transactionQuantityInput" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="transactionQuantityInput" min="1">
-                                </div>
-                                <button type="submit" class="btn btn-primary">Make Transaction</button>
-                            </form>
-                        </div>
+                </div>
+                <div class="card border-dark mb-3">
+                    <div class="card-header"><h4>Buy and Sell</h4></div>
+                    <div class="card-body">
+                        <form id="transactionForm">
+                            <div class="mb-3">
+                                <label for="transactionTickerInput" class="form-label">Ticker</label>
+                                <input type="text" class="form-control" id="transactionTickerInput">
+                            </div>
+                            <div class="mb-3">
+                                <label for="transactionTypeInput" class="form-label">Transaction Type</label>
+                                <select class="form-select" id="transactionTypeInput">
+                                    <option value="buy">Buy</option>
+                                    <option value="sell">Sell</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="transactionQuantityInput" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="transactionQuantityInput" min="1">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Make Transaction</button>
+                        </form>
                     </div>
                 </div>
             </div>
-            
         </div>
+    </main>
 
-        </main>
-    <script type='text/javascript' src='js/manage.js'></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get the portfolio ID from localStorage
-        const portfolioId = localStorage.getItem('portfolioId');
-        
-        if (!portfolioId) {
-            alert("Portfolio ID not found! Please go back.");
-            window.location.href = '/index.html'; // Redirect if no portfolio ID found
-            return;
+    <script type="text/javascript" src="js/manage.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get the portfolio ID from localStorage
+            const portfolioId = localStorage.getItem('portfolioId');
+            
+            if (!portfolioId) {
+                alert("Portfolio ID not found! Please go back.");
+                window.location.href = '/index.html'; // Redirect if no portfolio ID found
+                return;
+            }
+
+            // Fetch the cumulative portfolio data for the line chart
+            fetch(`/portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.dates && data.values) {
+                        renderCumulativeGrowthChart(data.dates, data.values);
+                    } else {
+                        console.error('Invalid data structure for cumulative portfolio value');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching cumulative portfolio data:', error);
+                    alert('Failed to load portfolio data.');
+                });
+
+            // Fetch asset composition data for the donut chart
+            fetch(`portfolio/asset/${portfolioId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && Array.isArray(data)) {
+                        renderAssetCompositionChart(data);
+                    } else {
+                        console.error('Invalid asset composition data');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching asset composition data:', error);
+                    alert('Failed to load asset composition data.');
+                });
+        });
+
+        // Function to render the line chart for portfolio growth
+        function renderCumulativeGrowthChart(dates, values) {
+            const ctx = document.getElementById('cumulativeGrowthChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Cumulative Growth',
+                        data: values,
+                        fill: false,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.1,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            },
+                            ticks: {
+                                autoSkip: true,
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Net Worth (GBP)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                    },
+                }
+            });
         }
 
-        // Fetch the cumulative portfolio data
-        fetch(`/portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.dates && data.values) {
-                    // Once we have the data, render the chart
-                    renderCumulativeGrowthChart(data.dates, data.values);
-                } else {
-                    console.error('Invalid data structure for cumulative portfolio value');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching cumulative portfolio data:', error);
-                alert('Failed to load portfolio data.');
-            });
-    });
+        // Function to render the donut chart for asset composition
+        // Predefined color palette (similar to the line chart's color scheme)
+const colorPalette = [
+'rgba(75, 192, 192, 0.7)', // Light Teal
+'rgba(153, 102, 255, 0.7)', // Light Purple
+'rgba(255, 159, 64, 0.7)', // Light Orange
+'rgba(54, 162, 235, 0.7)', // Light Blue
+'rgba(255, 99, 132, 0.7)', // Light Red
+'rgba(255, 205, 86, 0.7)', // Light Yellow
+'rgba(201, 203, 207, 0.7)'  // Light Grey
+];
 
-    // Function to render the cumulative growth chart
-    function renderCumulativeGrowthChart(dates, values) {
-        const ctx = document.getElementById('cumulativeGrowthChart').getContext('2d');
+// Function to render the donut chart for asset composition
+function renderAssetCompositionChart(assets) {
+const ctx = document.getElementById('assetCompositionChart').getContext('2d');
 
-        new Chart(ctx, {
-            type: 'line', // Line chart
-            data: {
-                labels: dates, // Use the dates for the x-axis
-                datasets: [{
-                    label: 'Cumulative Growth', // Label for the chart
-                    data: values, // Use the values for the y-axis
-                    fill: false, // No fill under the line
-                    borderColor: 'rgba(75, 192, 192, 1)', // Line color
-                    tension: 0.1, // Smoothness of the line
-                    pointRadius: 5, // Show points on the line
-                    pointBackgroundColor: 'rgba(75, 192, 192, 1)', // Point color
-                }]
+// Extract the labels (tickers) and data (quantities)
+const labels = assets.map(asset => asset.ticker);
+const data = assets.map(asset => asset.quantity);
+
+// Generate the color array based on the predefined color palette
+const backgroundColors = generateColorPalette(assets.length);
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Asset Composition',
+            data: data,
+            backgroundColor: backgroundColors, // Use the color palette
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
             },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Date' // X-axis title
-                        },
-                        ticks: {
-                            autoSkip: true,
-                            maxRotation: 45,
-                            minRotation: 45
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Net Worth (GBP)' // Y-axis title
-                        }
+            tooltip: {
+                callbacks: {
+                    label: function(tooltipItem) {
+                        return tooltipItem.label + ': ' + tooltipItem.raw + ' units';
                     }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                    },
-                },
+                }
             }
-        });
+        }
     }
-</script>
+});
+}
 
+        // Function to match assets to predefined color palette
+        function generateColorPalette(count) {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+            colors.push(colorPalette[i % colorPalette.length]); // Loop over the color palette if there are more assets than colors
+        }
+        return colors;
+        }
+
+    </script>
 </body>
 </html>
