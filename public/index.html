@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- For the line graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </head>
 <body>
@@ -18,13 +18,10 @@
 
     <main class="container my-4">
         <div class="row">
-            <!-- Net Worth Section -->
             <section id="net-worth" class="col-md-8 mb-4">
                 <h2>Net Worth Over Time</h2>
                 <canvas id="netWorthChart"></canvas>
             </section>
-
-            <!-- Market Updates Section -->
             <section id="market-updates" class="col-md-4">
                 <h2>Market Updates</h2>
                 <div id="gainers" class="mb-3">
@@ -55,10 +52,7 @@
                     <th>Manage</th>
                 </tr>
             </thead>
-            <tbody>
-
-            </tbody>
-            
+            <tbody></tbody>
         </table>
     </div>
 
@@ -66,7 +60,6 @@
     <script>
         // Populate username from JWT in localStorage
         const token = localStorage.getItem('token');
-        console.log(token);
         if (token) {
             try {
                 const payload = jwt_decode(token);
@@ -74,80 +67,133 @@
                     document.getElementById('username').textContent = payload.username;
                 }
             } catch (e) {
-                // Invalid token, do nothing
+                console.error('Invalid token', e);
             }
         }
 
-        const portfolioId = 1;  
-        fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
-        .then(response => response.json())
-        .then(data => {
-            const { dates, values } = data;
-            new Chart("netWorthChart", {
-                type: "line",
-                data: {
-                    labels: dates, 
-                    datasets: [{
-                        label: 'Net Worth', 
-                        backgroundColor: "rgba(0, 123, 255, 0.2)", 
-                        borderColor: "rgba(0, 123, 255, 1)", 
-                        data: values, 
-                        fill: true, 
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'month',
-                                tooltipFormat: 'll',
-                                displayFormats: {
-                                    month: 'MMM YY',
+        const portfolioIds = [];
+        const portfolioNames = {};
+
+        // Fetch the portfolio IDs and names for the user
+        fetch('userPortfolio/userPortfolio')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(pa => {
+                    portfolioIds.push(pa.portfolio_id);
+                });
+                fetchPortfolioDetails(); // Fetch portfolio details after we have IDs
+            })
+            .catch(err => console.error('Error fetching user portfolio IDs:', err));
+
+        // Fetch portfolio details like name and exchange
+        const fetchPortfolioDetails = () => {
+            fetch(`/portfolio/portfolio`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach((portfolio) => {
+                        portfolioNames[portfolio.id] = portfolio.name; // Save portfolio names
+                    });
+                    // Fetch data for the first portfolio after loading portfolio details
+                    fetchPortfolioData(portfolioIds[0], 0); // Start with the first portfolio
+                })
+                .catch(err => console.error('Error fetching portfolio details:', err));
+        };
+
+        // Fetch portfolio data by portfolioId and update the chart
+        const fetchPortfolioData = (portfolioId, index) => {
+            fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(`Data for Portfolio ${portfolioId}:`, data);
+                    if (data && data.dates && data.values) {
+                        updateChart(data.dates, data.values, portfolioNames[portfolioId], index);
+                    } else {
+                        console.error(`No data for portfolio ${portfolioId}`);
+                    }
+                    // After processing, move to the next portfolio if it exists
+                    if (portfolioIds[index + 1]) {
+                        fetchPortfolioData(portfolioIds[index + 1], index + 1);
+                    }
+                })
+                .catch(err => {
+                    console.error(`Error fetching data for portfolio ${portfolioId}:`, err);
+                });
+        };
+
+        // Global variable for the chart
+        let chart = null;
+
+        // Function to update the chart with the data for each portfolio
+        const updateChart = (dates, values, portfolioName, index) => {
+            if (!chart) {
+                // Create the chart if it doesn't exist yet
+                chart = new Chart("netWorthChart", {
+                    type: "line",
+                    data: {
+                        labels: dates,  // Assuming all portfolios have the same dates
+                        datasets: [{
+                            label: portfolioName,  // Use the portfolio name here
+                            backgroundColor: `rgba(${(index * 50)}, 123, 255, 0.2)`,
+                            borderColor: `rgba(${(index * 50)}, 123, 255, 1)`,
+                            data: values,
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                type: 'category', // String-based months
+                                title: {
+                                    display: true,
+                                    text: 'Date'
                                 }
                             },
-                            title: {
-                                display: true,
-                                text: 'Date'
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Net Worth (GBP)'
+                                }
                             }
                         },
-                        y: {
-                            title: {
+                        plugins: {
+                            legend: {
                                 display: true,
-                                text: 'Net Worth (GBP)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
+                                position: 'top'
+                            },
                         },
-                    },
-                }
-            });
-        })
-        .catch(err => {
-            console.error('Error fetching portfolio data:', err);
-        });
+                    }
+                });
+            } else {
+                // If chart already exists, just add the new dataset
+                chart.data.datasets.push({
+                    label: portfolioName,  // Use the portfolio name here
+                    backgroundColor: `rgba(${(index * 50)}, 123, 255, 0.2)`,
+                    borderColor: `rgba(${(index * 50)}, 123, 255, 1)`,
+                    data: values,
+                    fill: true,
+                });
+                chart.update();  // Update the chart
+            }
+        };
 
+        // Populate the Portfolio Table
         const table = document.getElementById('portfolioTable').getElementsByTagName('tbody')[0];
 
         fetch(`/portfolio/portfolio`)
-        .then(response => response.json())
-        .then(data => {
-            let i = 0;
-            data.forEach((p) => {
-                const newRow = table.insertRow();
-                const pName = newRow.insertCell(0);
-                const pExchange = newRow.insertCell(1);
-                const manageButton = newRow.insertCell(2);
-                pName.innerHTML = p.name;
-                pExchange.innerHTML = p.exchange;
-                manageButton.innerHTML = '<button class="btn btn-primary">Manage</button>'
+            .then(response => response.json())
+            .then(data => {
+                data.forEach((p) => {
+                    const newRow = table.insertRow();
+                    const pName = newRow.insertCell(0);
+                    const pExchange = newRow.insertCell(1);
+                    const manageButton = newRow.insertCell(2);
+                    pName.innerHTML = p.name;
+                    pExchange.innerHTML = p.exchange;
+                    manageButton.innerHTML = '<button class="btn btn-outline-dark">Manage</button>';
+                });
             })
-        })
+            .catch(err => console.error('Error fetching portfolio details:', err));
     </script>
 </body>
 </html>
