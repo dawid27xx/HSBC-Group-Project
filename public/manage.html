@@ -27,9 +27,10 @@
                 <div class="col h-100">
                     <div class="card border-dark mb-3">
                         <div class="card-header"><h4>Performance</h4></div>
-                        <div class="card-body">
-                            <p> Figure here </p>
-                        </div>
+                        <main class="container my-4">
+                            <canvas id="cumulativeGrowthChart"></canvas>
+                        </main>
+
                     </div>
 
                     <div class="container">
@@ -102,5 +103,84 @@
 
         </main>
     <script type='text/javascript' src='js/manage.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the portfolio ID from localStorage
+        const portfolioId = localStorage.getItem('portfolioId');
+        
+        if (!portfolioId) {
+            alert("Portfolio ID not found! Please go back.");
+            window.location.href = '/index.html'; // Redirect if no portfolio ID found
+            return;
+        }
+
+        // Fetch the cumulative portfolio data
+        fetch(`/portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.dates && data.values) {
+                    // Once we have the data, render the chart
+                    renderCumulativeGrowthChart(data.dates, data.values);
+                } else {
+                    console.error('Invalid data structure for cumulative portfolio value');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching cumulative portfolio data:', error);
+                alert('Failed to load portfolio data.');
+            });
+    });
+
+    // Function to render the cumulative growth chart
+    function renderCumulativeGrowthChart(dates, values) {
+        const ctx = document.getElementById('cumulativeGrowthChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line', // Line chart
+            data: {
+                labels: dates, // Use the dates for the x-axis
+                datasets: [{
+                    label: 'Cumulative Growth', // Label for the chart
+                    data: values, // Use the values for the y-axis
+                    fill: false, // No fill under the line
+                    borderColor: 'rgba(75, 192, 192, 1)', // Line color
+                    tension: 0.1, // Smoothness of the line
+                    pointRadius: 5, // Show points on the line
+                    pointBackgroundColor: 'rgba(75, 192, 192, 1)', // Point color
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date' // X-axis title
+                        },
+                        ticks: {
+                            autoSkip: true,
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Net Worth (GBP)' // Y-axis title
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                },
+            }
+        });
+    }
+</script>
+
 </body>
 </html>
