@@ -168,37 +168,35 @@ const portfolioId = localStorage.getItem('portfolioId');
 const portfolioName = localStorage.getItem('portfolioName');
 const portfolioExchange = localStorage.getItem('portfolioExchange');
 
-
-
-// document.getElementById('registerForm').addEventListener('submit', function(event) {
-//     event.preventDefault();
+document.getElementById('registerForm').addEventListener('submit', function(event) {
+    event.preventDefault();
     
-//     const username = document.getElementById('registerUsername').value;
-//     const password = document.getElementById('registerPassword').value;
+    const username = document.getElementById('registerUsername').value;
+    const password = document.getElementById('registerPassword').value;
 
-//     fetch('/auth/register', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({ username: username, password: password })
-//     }).then(response => {
-//         if (!response.ok) {
-//             throw new Error('Registration failed. Please enter a unique username.');
-//         }
-//         return response.json();
-//     })
-//     .then(data => {
-//         if (data.success) {
-//             // add info 
-//             alert('Registration successful! You can now log in.');
-//         } else {
-//             alert('Registration failed: ' + (data.message || 'Unknown error.'));
-//         }
-//     })
-//     .catch(error => {
-//         alert('An error occurred: ' + error.message);
-//     });
-// });
+    fetch('/auth/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: username, password: password })
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Registration failed. Please enter a unique username.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // add info 
+            alert('Registration successful! You can now log in.');
+        } else {
+            alert('Registration failed: ' + (data.message || 'Unknown error.'));
+        }
+    })
+    .catch(error => {
+        alert('An error occurred: ' + error.message);
+    });
+});
 
 
