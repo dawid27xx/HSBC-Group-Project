@@ -31,7 +31,7 @@
             <div class="col-md-6">
                 <div class="card p-4 shadow">
                     <h1 class="text-center text-success mb-4">Register</h1>
-                    <form id="registerForm" action="register.html">
+                    <form id="registerForm">
                         <div class="mb-3">
                             <label for="registerUsername" class="form-label">Username</label>
                             <input type="text" class="form-control" id="registerUsername" placeholder="Choose a username" required>
@@ -39,6 +39,9 @@
                         <div class="mb-3">
                             <label for="registerPassword" class="form-label">Password</label>
                             <input type="password" class="form-control" id="registerPassword" placeholder="Choose a password" required>
+                            <small class="form-text text-muted">
+                                Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.
+                            </small>
                         </div>
                         <button type="submit" class="btn btn-success w-100">Register</button>
                     </form>
@@ -47,6 +50,7 @@
         </div>
     </div>
     <script>
+        // Login Form Submission
         document.getElementById('loginForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const username = document.getElementById('loginUsername').value;
@@ -66,7 +70,6 @@
             })
             .then(data => {
                 if (data.success) {
-                    localStorage.setItem('token', data.token);
                     window.location.href = '/index.html';
                 } else {
                     alert('Login failed: ' + (data.message || 'Unknown error.'));
@@ -77,11 +80,35 @@
             });
         });
 
+        // Register Form Submission with Password Validation
         document.getElementById('registerForm').addEventListener('submit', function(event) {
             event.preventDefault();
             
             const username = document.getElementById('registerUsername').value;
             const password = document.getElementById('registerPassword').value;
+
+            // Password validation
+            const errors = [];
+            if (password.length < 8) {
+                errors.push('Password must be at least 8 characters long.');
+            }
+            if (!/[A-Z]/.test(password)) {
+                errors.push('Password must include at least one uppercase letter.');
+            }
+            if (!/[a-z]/.test(password)) {
+                errors.push('Password must include at least one lowercase letter.');
+            }
+            if (!/\d/.test(password)) {
+                errors.push('Password must include at least one number.');
+            }
+            if (!/[@$!%*?&]/.test(password)) {
+                errors.push('Password must include at least one special character (@, $, !, %, *, ?, &).');
+            }
+
+            if (errors.length > 0) {
+                alert(errors.join('\n')); // Show all validation errors
+                return; // Stop form submission
+            }
 
             fetch('/auth/register', {
                 method: 'POST',
@@ -97,7 +124,6 @@
             })
             .then(data => {
                 if (data.success) {
-                    // add info 
                     alert('Registration successful! You can now log in.');
                 } else {
                     alert('Registration failed: ' + (data.message || 'Unknown error.'));
@@ -107,8 +133,6 @@
                 alert('An error occurred: ' + error.message);
             });
         });
-
-
     </script>
-</body> 
+</body>
 </html>

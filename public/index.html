@@ -6,60 +6,130 @@
     <title>Portfolio Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.21/vanta.waves.min.js"></script>
+
+        <style>
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #transactionTable {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #transactionTable thead {
+            background-color: #343a40; /* Dark header */
+            color: #fff; /* White text for the header */
+        }
+
+        #transactionTable tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Light gray for even rows */
+        }
+
+        #transactionTable tbody tr:nth-child(odd) {
+            background-color: #ffffff; /* White for odd rows */
+        }
+
+        #transactionTable tbody tr:hover {
+            background-color: #e9ecef; /* Light hover effect */
+            cursor: pointer;
+        }
+
+        #transactionTable th, #transactionTable td {
+            vertical-align: middle;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        #transactionTable th {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .buy {
+            color: green;
+            font-weight: bold;
+        }
+
+        .sell {
+            color: red;
+            font-weight: bold;
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
-<body>
-    <nav class="navbar bg-dark">
+<body id="bodyy">
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand text-light"><strong>Portman</strong></a>
+            <a class="navbar-brand text-light">Portfolio Manager</a>
             <span class="nav-item text-light fs-5">Welcome, <strong id="username">User</strong></span>
         </div>
     </nav>
 
     <main class="container my-4">
         <div class="row">
+            <!-- Net Worth Section -->
             <section id="net-worth" class="col-md-8 mb-4">
-                <h2>Net Worth Over Time</h2>
-                <canvas id="netWorthChart"></canvas>
+                <div class="card p-4">
+                    <h2 class="text-center text-dark">Net Worth Over Time</h2>
+                    <canvas id="netWorthChart"></canvas>
+                </div>
             </section>
+
+            <!-- Recent Transactions Section -->
             <section id="market-updates" class="col-md-4">
-                <div class="container">
-                    <h2>Recent Transactions</h2>
-                    <table class="table table-striped" id="transactionTable">
-                        <thead>
+                <div class="table-container">
+                    <h2 class="text-center text-dark mb-4">Recent Transactions</h2>
+                    <table class="table table-striped table-hover table-bordered text-center" id="transactionTable">
+                        <thead class="table-dark">
                             <tr>
-                                <th>Transaction type</th>
+                                <th>Transaction Type</th>
                                 <th>Quantity</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
-            
+                            <!-- Rows will be dynamically populated -->
                         </tbody>
-                        
                     </table>
                 </div>
             </section>
         </div>
+
+        <!-- Portfolio Table -->
+        <div class="table-container mt-4">
+            <h2 class="text-center text-dark">Portfolios</h2>
+            <table class="table table-striped" id="portfolioTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Exchange</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </main>
-
-    <div class="container">
-        <h2>Portfolios</h2>
-        <table class="table table-striped" id="portfolioTable">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Exchange</th>
-                    <th>Manage</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-
-    <!-- <footer class="bg-primary text-white text-center py-3">
-        <p>&copy; 2025 Portfolio Manager</p>
-    </footer> -->
 
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
     <script>
@@ -109,20 +179,15 @@
             fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(`Data for Portfolio ${portfolioId}:`, data);
                     if (data && data.dates && data.values) {
                         updateChart(data.dates, data.values, portfolioNames[portfolioId], index);
-                    } else {
-                        console.error(`No data for portfolio ${portfolioId}`);
                     }
                     // After processing, move to the next portfolio if it exists
                     if (portfolioIds[index + 1]) {
                         fetchPortfolioData(portfolioIds[index + 1], index + 1);
                     }
                 })
-                .catch(err => {
-                    console.error(`Error fetching data for portfolio ${portfolioId}:`, err);
-                });
+                .catch(err => console.error(`Error fetching data for portfolio ${portfolioId}:`, err));
         };
 
         // Global variable for the chart
@@ -131,13 +196,12 @@
         // Function to update the chart with the data for each portfolio
         const updateChart = (dates, values, portfolioName, index) => {
             if (!chart) {
-                // Create the chart if it doesn't exist yet
                 chart = new Chart("netWorthChart", {
                     type: "line",
                     data: {
-                        labels: dates,  // Assuming all portfolios have the same dates
+                        labels: dates,
                         datasets: [{
-                            label: portfolioName,  // Use the portfolio name here
+                            label: portfolioName,
                             backgroundColor: `rgba(${(index * 50)}, 123, 255, 0.2)`,
                             borderColor: `rgba(${(index * 50)}, 123, 255, 1)`,
                             data: values,
@@ -148,7 +212,7 @@
                         responsive: true,
                         scales: {
                             x: {
-                                type: 'category', // String-based months
+                                type: 'category',
                                 title: {
                                     display: true,
                                     text: 'Date'
@@ -170,15 +234,14 @@
                     }
                 });
             } else {
-                // If chart already exists, just add the new dataset
                 chart.data.datasets.push({
-                    label: portfolioName,  // Use the portfolio name here
+                    label: portfolioName,
                     backgroundColor: `rgba(${(index * 50)}, 123, 255, 0.2)`,
                     borderColor: `rgba(${(index * 50)}, 123, 255, 1)`,
                     data: values,
                     fill: true,
                 });
-                chart.update();  // Update the chart
+                chart.update();
             }
         };
 
@@ -197,34 +260,37 @@
                     pExchange.innerHTML = p.exchange;
                     manageButton.innerHTML = '<button class="btn btn-outline-dark">Manage</button>';
                 });
-            })
-        
+            });
 
         const table2 = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
 
-        // update url
+        // Fetch and populate transaction data
         fetch(`/transaction/transaction`)
-        .then(response => response.json())
-        .then(data => {
-            data = data.reverse();
-            // 
-            data.forEach((p) => { 
-                // date we're getting: "datetime": "2025-08-29T09:01:28.000Z"
-                // new Date(date) <- converts it to standard format that js can understand
-                let date = new Date(p.datetime); 
-                // options for formatting the date
-                const options = { year: 'numeric', month: 'short' , day: 'numeric', hour: '2-digit', minute: '2-digit' };
-                // function that converts date objects to strings
-                date = date.toLocaleDateString('en-US', options);
-                const newRow = table2.insertRow();
-                const transactionType = newRow.insertCell(0);
-                const quantity = newRow.insertCell(1);
-                const dateTime = newRow.insertCell(2);
-                transactionType.innerHTML = p.transaction_type.toUpperCase();
-                quantity.innerHTML = p.quantity;
-                dateTime.innerHTML = date;
-            })
-        })
+    .then(response => response.json())
+    .then(data => {
+        data.reverse().forEach((p) => {
+            let date = new Date(p.datetime);
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            date = date.toLocaleDateString('en-US', options);
+
+            const newRow = table2.insertRow();
+            const transactionType = newRow.insertCell(0);
+            const quantity = newRow.insertCell(1);
+            const dateTime = newRow.insertCell(2);
+
+            // Check if it's a BUY or SELL order and set the innerHTML with a styled <p> tag
+            if (p.transaction_type.toUpperCase() === 'BUY') {
+                transactionType.innerHTML = `<p style="color: green; font-weight: bold;">BUY</p>`;
+            } else if (p.transaction_type.toUpperCase() === 'SELL') {
+                transactionType.innerHTML = `<p style="color: red; font-weight: bold;">SELL</p>`;
+            } else {
+                transactionType.innerHTML = `<p>${p.transaction_type.toUpperCase()}</p>`;
+            }
+
+            quantity.innerHTML = p.quantity;
+            dateTime.innerHTML = date;
+        });
+    });
     </script>
 </body>
 </html>
