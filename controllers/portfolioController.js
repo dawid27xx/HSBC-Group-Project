@@ -16,7 +16,7 @@ async function listAllPortfolios(req, res) {
 
 async function listAllPortfoliosCurrentUser(req, res) {
     try {
-        let userId = req.user.id;
+        let userId = 1;
         const portfolios = await Portfolio.listAllPortfoliosCurrentUser(userId);
         res.status(200).send(portfolios);
     } catch (err) {
@@ -36,12 +36,16 @@ async function getAssetsInPortfolio(req, res) {
 
 async function buySellOrder(req, res) {
     try {
-        const userId = req.user.id;
         const { portfolio_id, ticker, transaction_type, quantity} = req.body;
-        const buySellOrder = await Portfolio.buySellOrder(userId, portfolio_id, ticker, transaction_type, quantity);
-        res.status(200).send(buySellOrder);
+        console.log(portfolio_id, ticker, transaction_type, quantity);
+        const buySellOrder = await Portfolio.buySellOrder(portfolio_id, ticker, transaction_type, quantity);
+        if (buySellOrder){
+            res.status(200).json({ success: true, message: "Transaction completed successfully." });
+        } else {
+            res.status(500).json({ success: false, error: "Buy/Sell Order Failed."});
+        }
     } catch (err) {
-        res.status(500).json({error: "Buy/Sell Order Failed."})
+        res.status(500).json({ success: false, error: "Buy/Sell Order Failed."});
     }
 }
 
@@ -49,15 +53,20 @@ async function addAssetToPortfolio(req, res) {
     try {
         const { portfolio_id, ticker, quantity } = req.body;
         const assetsForPortfolio = await Portfolio.addAssetToPortfolio(portfolio_id, ticker, quantity);
-        res.status(200).send(assetsForPortfolio);
+        if (assetsForPortfolio) {
+            res.status(200).json({ success: true, message: "Asset added successfully" });
+        } else {
+            res.status(500).json({ success: false, error: "Failed adding asset in a portfolio." })
+        }
+       
     } catch (err) {
-        res.status(500).json({error: "Failed adding asset in a portfolio."})
+        res.status(500).json({ success: false, error: "Failed adding asset in a portfolio." })
     }
 }
 
 async function addPortfolios(req, res) {
     try {
-        let userId = req.user.id;
+        let userId = 1;
         const { name, exchange } = req.body;
         if (!name || !exchange) {
             res.status(400).json({error: "Missing Values"});

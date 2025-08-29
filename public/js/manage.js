@@ -66,6 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const table2 = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
 
+    
+
     // update url
     fetch(`/transaction/transactionByPortfolio/${portfolioId}`, {
         headers: {
@@ -94,6 +96,18 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 });
+
+const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            const payload = jwt_decode(token);
+            if (payload.username) {
+                document.getElementById('username').textContent = payload.username;
+            }
+        } catch (e) {
+            console.error('Invalid token', e);
+        }
+    }
 
 function renderCumulativeGrowthChart(dates, values) {
     const ctx = document.getElementById('cumulativeGrowthChart').getContext('2d');
@@ -207,7 +221,8 @@ document.getElementById('addAssetForm').addEventListener('submit', function(even
     fetch('/portfolio/asset', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
         },
         body: JSON.stringify({ portfolio_id: portfolioId, ticker: ticker, quantity: quantity })
     }).then(response => {
@@ -240,7 +255,8 @@ document.getElementById('transactionForm').addEventListener('submit', function(e
     fetch('/portfolio/asset', {
         method: 'PATCH',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token,
         },
         body: JSON.stringify({ portfolio_id: portfolioId, ticker: ticker, transaction_type: transactionType, quantity: quantity })
     }).then(response => {
