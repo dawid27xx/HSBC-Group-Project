@@ -183,6 +183,7 @@
         };
 
         // Populate the Portfolio Table
+        // Populate the Portfolio Table
         const table = document.getElementById('portfolioTable').getElementsByTagName('tbody')[0];
 
         fetch(`/portfolio/portfolio`)
@@ -193,11 +194,26 @@
                     const pName = newRow.insertCell(0);
                     const pExchange = newRow.insertCell(1);
                     const manageButton = newRow.insertCell(2);
+
                     pName.innerHTML = p.name;
                     pExchange.innerHTML = p.exchange;
-                    manageButton.innerHTML = '<button class="btn btn-outline-dark">Manage</button>';
+                    // Set up the manage button with an onClick event
+                    manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${p.id}, '${p.name}', '${p.exchange}')">Manage</button>
+`;
                 });
             })
+            .catch(err => console.error('Error fetching portfolio details:', err));
+
+// Function to handle the Manage button click
+function managePortfolio(id, name, exchange) {
+    // Store the portfolio ID in localStorage
+    localStorage.setItem('portfolioId', id);
+    localStorage.setItem('portfolioName', name);
+    localStorage.setItem('portfolioExchange', exchange);
+    // Redirect to manage.html
+    window.location.href = 'manage.html';
+}
+
         
 
         const table2 = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
