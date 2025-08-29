@@ -63,6 +63,36 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error fetching asset composition data:', error);
             alert('Failed to load asset composition data.');
         });
+
+    const table2 = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
+
+    // update url
+    fetch(`/transaction/transactionByPortfolio/${portfolioId}`, {
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        data = data.reverse();
+        // 
+        data.forEach((p) => { 
+            // date we're getting: "datetime": "2025-08-29T09:01:28.000Z"
+            // new Date(date) <- converts it to standard format that js can understand
+            let date = new Date(p.datetime); 
+            // options for formatting the date
+            const options = { year: 'numeric', month: 'short' , day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            // function that converts date objects to strings
+            date = date.toLocaleDateString('en-US', options);
+            const newRow = table2.insertRow();
+            const transactionType = newRow.insertCell(0);
+            const quantity = newRow.insertCell(1);
+            const dateTime = newRow.insertCell(2);
+            transactionType.innerHTML = p.transaction_type.toUpperCase();
+            quantity.innerHTML = p.quantity;
+            dateTime.innerHTML = date;
+        })
+    })
 });
 
 function renderCumulativeGrowthChart(dates, values) {
@@ -168,30 +198,30 @@ const portfolioId = localStorage.getItem('portfolioId');
 const portfolioName = localStorage.getItem('portfolioName');
 const portfolioExchange = localStorage.getItem('portfolioExchange');
 
-document.getElementById('registerForm').addEventListener('submit', function(event) {
+document.getElementById('addAssetForm').addEventListener('submit', function(event) {
     event.preventDefault();
     
-    const username = document.getElementById('registerUsername').value;
-    const password = document.getElementById('registerPassword').value;
+    const quantity = document.getElementById('addQuantityInput').value;
+    const ticker = document.getElementById('addTickerInput').value;
 
-    fetch('/auth/register', {
+    fetch('/portfolio/asset', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username: username, password: password })
+        body: JSON.stringify({ portfolio_id: portfolioId, ticker: ticker, quantity: quantity })
     }).then(response => {
         if (!response.ok) {
-            throw new Error('Registration failed. Please enter a unique username.');
+            throw new Error('Failed to add asset.');
         }
         return response.json();
     })
     .then(data => {
         if (data.success) {
             // add info 
-            alert('Registration successful! You can now log in.');
+            alert('Asset added successfully!');
         } else {
-            alert('Registration failed: ' + (data.message || 'Unknown error.'));
+            alert('Failed to add asset: ' + (data.error || 'Unknown error.'));
         }
     })
     .catch(error => {
@@ -199,4 +229,35 @@ document.getElementById('registerForm').addEventListener('submit', function(even
     });
 });
 
+document.getElementById('transactionForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const ticker = document.getElementById('transactionTickerInput').value;
+    const transactionTypeElement = document.getElementById('transactionTypeInput');
+    const transactionType = transactionTypeElement.options[transactionTypeElement.selectedIndex].text;
+    const quantity = parseInt(document.getElementById('transactionQuantityInput').value);
 
+    fetch('/portfolio/asset', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ portfolio_id: portfolioId, ticker: ticker, transaction_type: transactionType, quantity: quantity })
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to make transaction.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // add info 
+            alert('Transaction made successfully!');
+        } else {
+            alert('Failed to make transaction: ' + (data.error || 'Unknown error.'));
+        }
+    })
+    .catch(error => {
+        alert('An error occurred: ' + error.message);
+    });
+});
