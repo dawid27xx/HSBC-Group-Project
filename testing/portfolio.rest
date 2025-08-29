@@ -6,39 +6,36 @@
 #     "exchange": "LSEG"
 # }
 
-<<<<<<< HEAD
 # GET http://localhost:3000/portfolio/portfolio HTTP/1.1
 # Content-Type: application/json
 
-# GET http://localhost:3000/portfolio/asset/1 HTTP/1.1
-=======
-GET http://localhost:3000/portfolio/portfolio HTTP/1.1
-Content-Type: application/json
+# # GET http://localhost:3000/portfolio/asset/1 HTTP/1.1
+# GET http://localhost:3000/portfolio/portfolio HTTP/1.1
+# Content-Type: application/json
 
 # GET http://localhost:3000/portfolio/asset/getPricesLastTwoYear/MSFT HTTP/1.1
 # Content-Type: application/json
 
 # POST http://localhost:3000/portfolio/asset HTTP/1.1
->>>>>>> a358426bce9005e0c0be998e0be87858f5b34620
 # Content-Type: application/json
 
-POST http://localhost:3000/portfolio/asset HTTP/1.1
-Content-Type: application/json
-
-{
-    "portfolio_id": 1,
-    "ticker": "HSBC",
-    "quantity": 100
-}
-
-# router.patch("/asset", portfolioController.buySellOrder);
-
-# PATCH http://localhost:3000/portfolio/asset HTTP/1.1
+# POST http://localhost:3000/portfolio/asset HTTP/1.1
 # Content-Type: application/json
 
 # {
 #     "portfolio_id": 1,
-#     "ticker": "DEF",
-#     "transaction_type": "sell",
-#     "quantity": 10
+#     "ticker": "HSBC",
+#     "quantity": 100
 # }
+
+# router.patch("/asset", portfolioController.buySellOrder);
+
+PATCH http://localhost:3000/portfolio/asset HTTP/1.1
+Content-Type: application/json
+
+{
+    "portfolio_id": 1,
+    "ticker": "MSFT",
+    "transaction_type": "sell",
+    "quantity": 2
+}

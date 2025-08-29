@@ -206,15 +206,23 @@
         fetch(`/transaction/transaction`)
         .then(response => response.json())
         .then(data => {
+            data = data.reverse();
             // 
-            data.forEach((p) => {
+            data.forEach((p) => { 
+                // date we're getting: "datetime": "2025-08-29T09:01:28.000Z"
+                // new Date(date) <- converts it to standard format that js can understand
+                let date = new Date(p.datetime); 
+                // options for formatting the date
+                const options = { year: 'numeric', month: 'short' , day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                // function that converts date objects to strings
+                date = date.toLocaleDateString('en-US', options);
                 const newRow = table2.insertRow();
                 const transactionType = newRow.insertCell(0);
                 const quantity = newRow.insertCell(1);
                 const dateTime = newRow.insertCell(2);
-                transactionType.innerHTML = p.transaction_type;
+                transactionType.innerHTML = p.transaction_type.toUpperCase();
                 quantity.innerHTML = p.quantity;
-                dateTime.innerHTML = p.datetime;
+                dateTime.innerHTML = date;
             })
         })
     </script>
