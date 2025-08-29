@@ -18,26 +18,91 @@
     </nav>
 
     <main class="container my-4">
-        <div class="row">
-            <!-- Net Worth Section -->
-            <section id="net-worth" class="col-md-8 mb-4">
-                <h2>Manage Portfolio NAME</h2>
-                <canvas id="netWorthChart"></canvas>
-            </section>
+        <div class="row pb-4" id="pageTitle">
+            <h2>Manage Portfolio <strong id="portfolioName">name_here</strong></h2>
         </div>
         
-        <div class="container">
-        <h2>Portfolios</h2>
-        <table class="table table-striped" id="portfolioTable">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Exchange</th>
-                    <th>Manage</th>
-                </tr>
-            </thead>
-        </table>
-    </div>
+
+            <div class="row pb-4 align-items-stretch" id="mainPageContents">
+                <div class="col h-100">
+                    <div class="card border-dark mb-3">
+                        <div class="card-header"><h4>Performance</h4></div>
+                        <div class="card-body">
+                            <p> Figure here </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col h-100">
+                    <div class="card border-dark mb-3">
+                        <div class="card-header"><h4>Asset Make-Up</h4></div>
+                        <div class="card-body">
+                            <p> Figure here </p>
+                        </div>
+                    </div>
+                    <div class="card border-dark mb-3 mt-4">
+                        <div class="card-header"><h4>Add an Asset</h4></div>
+                        <div class="card-body">
+                            <form id="addAssetForm">
+                                <div class="mb-3">
+                                    <label for="addTickerInput" class="form-label">Ticker</label>
+                                    <input type="text" class="form-control" id="addTickerInput">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="addQuantityInput" class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" id="addQuantityInput">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add Asset</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card border-dark mb-3">
+                        <div class="card-header"><h4>Buy and Sell</h4></div>
+                        <div class="card-body">
+                            <form id="transactionForm">
+                                <div class="mb-3">
+                                    <label for="transactionTickerInput" class="form-label">Ticker</label>
+                                    <input type="text" class="form-control" id="transactionTickerInput">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="transactionTypeInput" class="form-label">Transaction Type</label>
+                                    <select class="form-select" id="transactionTypeInput">
+                                        <option value="buy">Buy</option>
+                                        <option value="sell">Sell</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="transactionQuantityInput" class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" id="transactionQuantityInput" min="1">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Make Transaction</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col h-100">
+                <div class="card border-dark mb-3">
+                    <div class="card-header"><h4>Add an Asset</h4></div>
+                    <div class="card-body">
+                        <form id="addAssetForm">
+                            <div class="mb-3">
+                                <label for="tickerInput" class="form-label">Ticker</label>
+                                <input type="text" class="form-control" id="tickerInput">
+                            </div>
+                            <div class="mb-3">
+                                <label for="addQuantityInput" class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="addQuantityInput">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Asset</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            
+        </div>
 
            
         </main>
