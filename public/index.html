@@ -80,7 +80,11 @@
         const portfolioNames = {};
 
         // Fetch the portfolio IDs and names for the user
-        fetch('userPortfolio/userPortfolio')
+        fetch('userPortfolio/userPortfolio', {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 data.forEach(pa => {
@@ -92,7 +96,11 @@
 
         // Fetch portfolio details like name and exchange
         const fetchPortfolioDetails = () => {
-            fetch(`/portfolio/portfolio`)
+            fetch(`/portfolio/portfolio`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     data.forEach((portfolio) => {
@@ -106,7 +114,11 @@
 
         // Fetch portfolio data by portfolioId and update the chart
         const fetchPortfolioData = (portfolioId, index) => {
-            fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`)
+            fetch(`portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     console.log(`Data for Portfolio ${portfolioId}:`, data);
@@ -186,7 +198,11 @@
         // Populate the Portfolio Table
         const table = document.getElementById('portfolioTable').getElementsByTagName('tbody')[0];
 
-        fetch(`/portfolio/portfolio`)
+        fetch(`/portfolio/portfolio`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 data.forEach((p) => {
@@ -219,7 +235,11 @@ function managePortfolio(id, name, exchange) {
         const table2 = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
 
         // update url
-        fetch(`/transaction/transaction`)
+        fetch(`/transaction/transaction`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
         .then(response => response.json())
         .then(data => {
             data = data.reverse();
