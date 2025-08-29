@@ -66,6 +66,7 @@
             })
             .then(data => {
                 if (data.success) {
+                    localStorage.setItem('token', data.token);
                     window.location.href = '/index.html';
                 } else {
                     alert('Login failed: ' + (data.message || 'Unknown error.'));

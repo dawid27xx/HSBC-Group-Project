@@ -2,9 +2,9 @@ POST http://localhost:3000/portfolioAsset/portfolioAsset HTTP/1.1
 Content-Type: application/json
 
 {
-    "portfolio_id": 1,
-    "ticker": "DEF",
-    "quantity": 10
+    "portfolio_id": 3,
+    "ticker": "MSFT",
+    "quantity": 25
 }
 
 # GET http://localhost:3000/portfolioAsset/portfolioAsset HTTP/1.1
