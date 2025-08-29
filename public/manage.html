@@ -64,11 +64,11 @@
                             <form id="addAssetForm">
                                 <div class="mb-3">
                                     <label for="addTickerInput" class="form-label">Ticker</label>
-                                    <input type="text" class="form-control" id="addTickerInput">
+                                    <input type="text" class="form-control" id="addTickerInput" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="addQuantityInput" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="addQuantityInput">
+                                    <input type="number" class="form-control" id="addQuantityInput" required>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Add Asset</button>
                             </form>
@@ -80,18 +80,18 @@
                             <form id="transactionForm">
                                 <div class="mb-3">
                                     <label for="transactionTickerInput" class="form-label">Ticker</label>
-                                    <input type="text" class="form-control" id="transactionTickerInput">
+                                    <input type="text" class="form-control" id="transactionTickerInput" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="transactionTypeInput" class="form-label">Transaction Type</label>
-                                    <select class="form-select" id="transactionTypeInput">
+                                    <select class="form-select" id="transactionTypeInput" required>
                                         <option value="buy">Buy</option>
                                         <option value="sell">Sell</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label for="transactionQuantityInput" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="transactionQuantityInput" min="1">
+                                    <input type="number" class="form-control" id="transactionQuantityInput" min="1" required>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Make Transaction</button>
                             </form>
