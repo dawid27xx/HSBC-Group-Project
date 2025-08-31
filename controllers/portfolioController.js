@@ -3,15 +3,6 @@ const UserPortfolio = require("../models/userPortfolio");
 const yf = require("yahoo-finance2").default;
 
 // these functions use function defined in the model, and make them available to requests by the user
-async function listAllPortfolios(req, res) {
-  try {
-    const portfolios = await Portfolio.listAllPortfolios();
-    res.status(200).send(portfolios);
-  } catch (err) {
-    res.status(500).json({ error: "Failed fetching portfolios." });
-  }
-}
-
 async function listAllPortfoliosCurrentUser(req, res) {
   try {
     let userId = req.user.id;
@@ -47,12 +38,10 @@ async function buySellOrder(req, res) {
       quantity
     );
     if (buySellOrder) {
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Transaction completed successfully.",
-        });
+      res.status(200).json({
+        success: true,
+        message: "Transaction completed successfully.",
+      });
     } else {
       res.status(500).json({ success: false, error: "Buy/Sell Order Failed." });
     }
@@ -105,124 +94,41 @@ async function addPortfolios(req, res) {
   }
 }
 
-async function getPriceOfStock(req, res) {
-  try {
-    const { ticker } = req.params;
-    const result = await getPricesHelper(ticker);
-    res.status(200).json({ result: result });
-  } catch (err) {
-    res.status(500).json({ error: "Error fetching stock price" });
-  }
-}
+// EXTERAL API FUNCTIONS
 
-async function getWeeklyChangeForTicker(req, res) {
-  try {
-    const { ticker } = req.params;
-    const end = new Date();
-    // 9 days to avoid weekend troubles
-    const start = new Date(end.getTime() - 9 * 24 * 60 * 60 * 1000);
-
-    yf.suppressNotices(["yahooSurvey"]);
-    const chart = await yf.chart(ticker, {
-      period1: start,
-      period2: end,
-      interval: "1d",
-    });
-
-    const quotes = (chart.quotes || []).filter((q) => q.close != null);
-    
-    if (quotes.length < 2)
-      return res.status(400).json({ error: "Insufficient data" });
-
-    const first = quotes[0].close;
-    const last = quotes[quotes.length - 1].close;
-    const changePct = ((last - first) / first) * 100;
-    res.status(200).json({ ticker, changePct });
-  } catch (err) {
-    res.status(500).json({ error: "Failed weekly change" });
-  }
-}
-
+// get a list of weekly changes per stock in portfolio
 async function getWeeklyChangeForPortfolio(req, res) {
   try {
     const { portfolio_id } = req.params;
     const assets = await Portfolio.getAssetsInPortfolio(portfolio_id);
-    const out = [];
+
+    const result = [];
+
     for (const a of assets) {
       try {
         const end = new Date();
         const start = new Date(end.getTime() - 9 * 24 * 60 * 60 * 1000);
+
         yf.suppressNotices(["yahooSurvey"]);
+
         const chart = await yf.chart(a.ticker, {
           period1: start,
           period2: end,
           interval: "1d",
         });
-        const quotes = (chart.quotes || []).filter((q) => q.close != null);
-        if (quotes.length >= 2) {
-          const first = quotes[0].close;
-          const last = quotes[quotes.length - 1].close;
-          const changePct = ((last - first) / first) * 100;
-          out.push({ ticker: a.ticker, changePct });
-        }
+
+        const quotes = chart.quotes;
+
+        const first = quotes[0].close;
+        const last = quotes[quotes.length - 1].close;
+        const changePct = ((last - first) / first) * 100;
+        result.push({ ticker: a.ticker, changePct });
       } catch {}
     }
-    res.status(200).json(out);
+    res.status(200).json(result);
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Failed weekly change for portfolio" });
+    res.status(500).json({ error: "Failed weekly change for portfolio" });
   }
-}
-
-async function getPricesLastTwoYear(req, res) {
-  try {
-    const { ticker } = req.params;
-    const result = await getPricesLastTwoYearHelper(ticker);
-    res.status(200).json({ result: result });
-  } catch (err) {
-    res.status(500).json({ error: "Error fetching stock price" });
-  }
-}
-
-async function getPricesLastTwoYearForPortfolio(req, res) {
-  try {
-    let assetTickers = [];
-    const { portfolio_id } = req.params;
-    const assetsForPortfolio = await Portfolio.getAssetsInPortfolio(
-      portfolio_id
-    );
-    assetsForPortfolio.forEach((a) => {
-      assetTickers.push(a.ticker);
-    });
-    console.log(assetTickers);
-    let finalresult = [];
-
-    for (const ticker of assetTickers) {
-      const result = await getPricesLastTwoYearHelper(ticker);
-      finalresult.push({ ticker: ticker, result: result });
-    }
-
-    res.status(200).send(finalresult);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Error fetching stock prices for portfolio" });
-  }
-}
-
-async function getPricesHelper(ticker) {
-  yf.suppressNotices(["yahooSurvey"]);
-  const quote = await yf.quote(ticker);
-  // console.log(quote);
-  const { regularMarketPrice, currency, displayName, symbol } = quote;
-  const stockData = {
-    price: regularMarketPrice,
-    currency: currency,
-    displayName: displayName,
-    symbol: symbol,
-  };
-  return stockData;
 }
 
 // get last 2 years
@@ -253,6 +159,7 @@ async function getPricesLastTwoYearHelper(ticker) {
   return result;
 }
 
+//get last two years used for graph
 async function getCumulativePortfolioValue(req, res) {
   try {
     const { portfolio_id } = req.params;
@@ -267,6 +174,7 @@ async function getCumulativePortfolioValue(req, res) {
 
       const [dates, prices] = await getPricesLastTwoYearHelper(ticker);
 
+      // updates dates only once
       if (allDates.length === 0) {
         allDates = dates;
         dates.forEach((date) => {
@@ -282,6 +190,7 @@ async function getCumulativePortfolioValue(req, res) {
       }
     }
 
+    // dict into array
     const responseDates = allDates;
     const responseValues = responseDates.map(
       (date) => cumulativeValueByDate[date]
@@ -293,23 +202,16 @@ async function getCumulativePortfolioValue(req, res) {
     });
   } catch (err) {
     console.error("Error in getCumulativePortfolioValue:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to compute portfolio value" });
+    res.status(500).json({ error: "Failed to compute portfolio value" });
   }
 }
 
 module.exports = {
-  getCumulativePortfolioValue,
-  getPricesLastTwoYearForPortfolio,
-  getPriceOfStock,
-  getPricesLastTwoYear,
-  listAllPortfolios,
-  buySellOrder,
-  addAssetToPortfolio,
-  addPortfolios,
-  listAllPortfoliosCurrentUser,
-  getAssetsInPortfolio,
-  getWeeklyChangeForTicker,
-  getWeeklyChangeForPortfolio,
+  getCumulativePortfolioValue, // needed
+  buySellOrder, // needed
+  addAssetToPortfolio, // needed
+  addPortfolios, // needed
+  listAllPortfoliosCurrentUser, //needed
+  getAssetsInPortfolio, // neded
+  getWeeklyChangeForPortfolio, /// needed
 };

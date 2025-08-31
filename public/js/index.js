@@ -13,7 +13,9 @@ if (token) {
 
 const portfolioIds = [];
 const portfolioNames = {};
-const assetTickers = {}; // key: portfolio_asset_id → value: ticker
+const assetTickers = {};
+let chart = null;
+
 
 // Fetch user portfolio IDs
 fetch("userPortfolio/userPortfolio", {
@@ -22,11 +24,12 @@ fetch("userPortfolio/userPortfolio", {
   .then((response) => response.json())
   .then((data) => {
     data.forEach((pa) => portfolioIds.push(pa.portfolio_id));
-    fetchPortfolioDetails(); // continue once we have IDs
+    // for each portfolio
+    fetchPortfolioDetails();
   })
   .catch((err) => console.error("Error fetching user portfolio IDs:", err));
 
-// Fetch portfolio details like name and exchange
+  
 function fetchPortfolioDetails() {
   fetch(`/portfolio/portfolio`, {
     headers: { Authorization: "Bearer " + token },
@@ -36,13 +39,12 @@ function fetchPortfolioDetails() {
       for (const portfolio of data) {
         portfolioNames[portfolio.id] = portfolio.name;
 
-        // Fetch assets for each portfolio
         const res = await fetch(`/portfolio/asset/${portfolio.id}`, {
           headers: { Authorization: "Bearer " + token },
         });
         const assets = await res.json();
         assets.forEach((a) => {
-          assetTickers[a.id] = a.ticker; // map asset_id → ticker
+          assetTickers[a.id] = a.ticker; // map asset_id to tickers used later
         });
       }
 
@@ -80,7 +82,7 @@ function fetchPortfolioData(portfolioId, index) {
     );
 }
 
-let chart = null;
+// update chart
 function updateChart(dates, values, portfolioName, index) {
   if (!chart) {
     chart = new Chart("netWorthChart", {
@@ -130,7 +132,7 @@ fetch(`/portfolio/portfolio`, {
 })
   .then((response) => response.json())
   .then(async (data) => {
-    // Process all portfolios in parallel and wait for all to finish
+    // process all portfolios in parallel and wait for all to finish
     await Promise.all(
       data.map(async (p) => {
         const newRow = table.insertRow();
@@ -142,8 +144,8 @@ fetch(`/portfolio/portfolio`, {
 
         pName.textContent = p.name;
         pExchange.textContent = p.exchange;
-        pValue.textContent = "…";
-        pChange.textContent = "…";
+        pValue.textContent = "-";
+        pChange.textContent = "-";
         manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${p.id}, '${p.name}', '${p.exchange}')">Manage</button>`;
 
         // Fetch current portfolio value
@@ -156,7 +158,7 @@ fetch(`/portfolio/portfolio`, {
           if (valueData?.values?.length) {
             const latestValue = valueData.values[valueData.values.length - 1];
             pValue.textContent = `$${latestValue.toLocaleString()}`;
-            totalNetWorth += Number(latestValue) || 0;
+            totalNetWorth += Number(latestValue);
           } else {
             pValue.textContent = "-";
           }
@@ -197,8 +199,8 @@ fetch(`/portfolio/portfolio`, {
   })
   .catch((err) => console.error("Error fetching portfolio details:", err));
 
-  
 
+  // helper for manage page navigation
 function managePortfolio(id, name, exchange) {
   localStorage.setItem("portfolioId", id);
   localStorage.setItem("portfolioName", name);
@@ -206,7 +208,7 @@ function managePortfolio(id, name, exchange) {
   window.location.href = "manage.html";
 }
 
-// Handle Add Portfolio form submit
+// Adds new portfolio and updates table accordingly
 document
   .getElementById("addPortfolioForm")
   .addEventListener("submit", function (e) {
@@ -252,7 +254,10 @@ document
       });
   });
 
-// ---- Transaction table population
+
+
+// Update Transaction Table
+
 function fetchTransactions() {
   const table2 = document
     .getElementById("transactionTable")
@@ -273,9 +278,8 @@ function fetchTransactions() {
           hour: "2-digit",
           minute: "2-digit",
         };
-        const formattedDate = date
-          ? date.toLocaleDateString("en-GB", options) // UK-style shorter date
-          : "N/A";
+
+        const formattedDate = date.toLocaleDateString("en-GB", options) 
 
         const newRow = table2.insertRow();
 
@@ -285,11 +289,8 @@ function fetchTransactions() {
         const quantityCell = newRow.insertCell(3);
         const dateCell = newRow.insertCell(4);
 
-        portfolioCell.textContent =
-          portfolioNames[p.portfolio_id] || `Portfolio #${p.portfolio_id}`;
-        tickerCell.textContent =
-          assetTickers[p.portfolio_asset_id] ||
-          `Asset #${p.portfolio_asset_id}`;
+        portfolioCell.textContent = portfolioNames[p.portfolio_id] 
+        tickerCell.textContent = assetTickers[p.portfolio_asset_id] 
         typeCell.textContent = p.transaction_type.toUpperCase();
         quantityCell.textContent = p.quantity;
         dateCell.textContent = formattedDate;

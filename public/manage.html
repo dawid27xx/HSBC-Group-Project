@@ -10,16 +10,15 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- For the line graph -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <style>
-      /* Table header override */
+
+      /* LLM STYLING */
       #transactionTable thead th {
         background-color: #212529 !important;
         color: #fff !important;
       }
 
-      /* Pulse effect on hover */
       #transactionTable tbody tr {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         cursor: pointer;
@@ -30,17 +29,15 @@
         background-color: #f8f9fa !important;
       }
 
-      /* Buy = green, Sell = red */
       .order-buy {
-        color: #198754 !important; /* Bootstrap green */
+        color: #198754 !important; 
         font-weight: 600;
       }
       .order-sell {
-        color: #dc3545 !important; /* Bootstrap red */
+        color: #dc3545 !important; 
         font-weight: 600;
       }
 
-      /* Add subtle shadow to table */
       #transactionTable {
         border-radius: 0.5rem;
         overflow: hidden;
@@ -142,7 +139,6 @@
       </div>
 
       <div class="row mt-4">
-        <!-- Portfolio Value -->
         <div class="col-md-4 mb-3">
           <div class="card text-center border-dark shadow-sm h-100 bg-dark text-light">
             <div class="card-body py-3 d-flex flex-column justify-content-center">
@@ -151,8 +147,7 @@
             </div>
           </div>
         </div>
-      
-        <!-- Portfolio Stats -->
+
         <div class="col-md-8 mb-3">
           <div class="card border-dark shadow-sm h-100 bg-dark text-light">
             <div class="card-body">
@@ -177,7 +172,6 @@
       </div>
       
 
-      <!-- Equal height cards -->
       <div class="row pb-4 align-items-stretch" id="mainPageContents">
         <div class="col-md-6 d-flex">
           <div class="card border-dark mb-3 w-100 h-100">

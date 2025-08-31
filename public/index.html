@@ -12,13 +12,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <style>
-      /* Table header override */
+      /* LLM STYLING */
       #transactionTable thead th {
         background-color: #212529 !important;
         color: #fff !important;
       }
 
-      /* Pulse effect on hover */
       #transactionTable tbody tr {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         cursor: pointer;
@@ -29,17 +28,15 @@
         background-color: #f8f9fa !important;
       }
 
-      /* Buy = green, Sell = red */
       .order-buy {
-        color: #198754 !important; /* Bootstrap green */
+        color: #198754 !important;
         font-weight: 600;
       }
       .order-sell {
-        color: #dc3545 !important; /* Bootstrap red */
+        color: #dc3545 !important;
         font-weight: 600;
       }
 
-      /* Add subtle shadow to table */
       #transactionTable {
         border-radius: 0.5rem;
         overflow: hidden;
@@ -86,24 +83,23 @@
           </div>
         </section>
       </div>
-      
     </main>
 
-    <!-- Add this just below your existing graph + transactions row -->
     <div class="container my-4">
       <div class="row">
-        <!-- Left column: Current Net Worth -->
-        <div class="col-md-4 mb-3"> 
-          <div class="card text-center border-dark shadow-sm h-100 bg-dark text-light">
-            <div class="card-body py-3 d-flex flex-column justify-content-center">
+        <div class="col-md-4 mb-3">
+          <div
+            class="card text-center border-dark shadow-sm h-100 bg-dark text-light"
+          >
+            <div
+              class="card-body py-3 d-flex flex-column justify-content-center"
+            >
               <h5 class="card-title text-info">Current Net Worth</h5>
               <h2 id="netWorthValue" class="fw-bold text-success">$0</h2>
             </div>
           </div>
         </div>
-        
-    
-        <!-- Right column: Economy Stats -->
+
         <div class="col-md-8 mb-3">
           <div class="card border-dark shadow-sm h-100">
             <div class="card-header bg-dark text-light">
@@ -141,11 +137,9 @@
         </div>
       </div>
     </div>
-    
-
 
     <div class="container">
-      <div class=" d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center">
         <h2 class="mb-0">Portfolios</h2>
         <button
           class="btn btn-outline-success"
@@ -168,10 +162,8 @@
         </thead>
         <tbody></tbody>
       </table>
-      
     </div>
 
-    <!-- Add Portfolio Modal -->
     <div
       class="modal fade"
       id="addPortfolioModal"
@@ -243,8 +235,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
     <script src="js/index.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

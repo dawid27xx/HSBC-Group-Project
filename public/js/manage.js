@@ -46,13 +46,13 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
   
-    let lastWeekChangeTotal = 0;   // ✅ keep as number
+    let lastWeekChangeTotal = 0;   
     let totalStocks = 0;
   
     const itemsHTML = data
       .map(({ ticker, changePct }) => {
         const pct = Number(changePct);
-        lastWeekChangeTotal += pct;   // ✅ sum as number
+        lastWeekChangeTotal += pct;   
         totalStocks += 1;
   
         const pctStr = pct.toFixed(2);
@@ -66,7 +66,6 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .join("");
   
-    // ✅ compute average
     let avgChange = totalStocks > 0 ? (lastWeekChangeTotal / totalStocks).toFixed(2) : "0.00";
     const sign = avgChange >= 0 ? "+" : "";
     const cls = avgChange >= 0 ? "order-buy" : "order-sell";
@@ -76,7 +75,6 @@ document.addEventListener("DOMContentLoaded", function () {
   
     document.getElementById("portfolioStockCount").textContent = totalStocks;
   
-    // ---- ticker scrolling
     let repeated = itemsHTML;
     while (track.scrollWidth < window.innerWidth * 2) {
       repeated += itemsHTML;
@@ -101,13 +99,12 @@ document.addEventListener("DOMContentLoaded", function () {
     .then((data) => {
       if (data.dates && data.values) {
         renderCumulativeGrowthChart(data.dates, data.values);
-        const latest = data.values[data.values.length - 1]; // ✅ last element
-        const first = data.values[data.values.length - 12];                       // ✅ first element
+        const latest = data.values[data.values.length - 1]; 
+        const first = data.values[data.values.length - 12];                     
         const yearlyChange = ((latest - first) / first) * 100;
 
         document.getElementById("portfolioValue").innerText = `$${latest.toLocaleString()}`;
 
-      
         const el = document.getElementById("portfolioChangeYear");
         el.innerHTML = `${yearlyChange >= 0 ? "+" : ""}${yearlyChange.toFixed(2)}%`;
         el.classList.add(yearlyChange >= 0 ? "order-buy" : "order-sell");
@@ -120,7 +117,6 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Failed to load portfolio data.");
     });
 
-  // Fetch asset composition data for the donut chart
   fetch(`portfolio/asset/${portfolioId}`, {
     headers: {
       Authorization: "Bearer " + token,
@@ -143,8 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("transactionTable")
     .getElementsByTagName("tbody")[0];
 
-  // update url
-  // update url
+
 fetch(`/transaction/transactionByPortfolio/${portfolioId}`, {
     headers: {
         'Authorization': 'Bearer ' + token
@@ -167,7 +162,6 @@ fetch(`/transaction/transactionByPortfolio/${portfolioId}`, {
         const type = p.transaction_type.toUpperCase();
         transactionType.textContent = type;
 
-        // ✅ Apply green/red styling
         if (type === "BUY") {
             transactionType.classList.add("order-buy");
         } else if (type === "SELL") {
@@ -243,13 +237,13 @@ function renderCumulativeGrowthChart(dates, values) {
 }
 
 const colorPalette = [
-  "rgba(75, 192, 192, 0.7)", // Light Teal
-  "rgba(153, 102, 255, 0.7)", // Light Purple
-  "rgba(255, 159, 64, 0.7)", // Light Orange
-  "rgba(54, 162, 235, 0.7)", // Light Blue
-  "rgba(255, 99, 132, 0.7)", // Light Red
-  "rgba(255, 205, 86, 0.7)", // Light Yellow
-  "rgba(201, 203, 207, 0.7)", // Light Grey
+  "rgba(75, 192, 192, 0.7)",
+  "rgba(153, 102, 255, 0.7)", 
+  "rgba(255, 159, 64, 0.7)", 
+  "rgba(54, 162, 235, 0.7)", 
+  "rgba(255, 99, 132, 0.7)",
+  "rgba(255, 205, 86, 0.7)", 
+  "rgba(201, 203, 207, 0.7)", 
 ];
 
 function renderAssetCompositionChart(assets) {
@@ -274,14 +268,14 @@ function renderAssetCompositionChart(assets) {
       legend: {
         position: "right",
         labels: {
-          fontSize: 14, // make legend text larger
+          fontSize: 14, 
           fontStyle: "bold",
           generateLabels: function (chart) {
             const dataset = chart.data.datasets[0];
             return chart.data.labels.map((label, i) => {
               const value = dataset.data[i];
               return {
-                text: `${label} (${value})`, // ticker + quantity
+                text: `${label} (${value})`,
                 fillStyle: dataset.backgroundColor[i],
                 hidden: isNaN(dataset.data[i]) || dataset.data[i] === null,
                 index: i,
@@ -416,7 +410,6 @@ document
       })
       .then((data) => {
         if (data.success) {
-          // add info
           alert("Transaction made successfully!");
         } else {
           alert(

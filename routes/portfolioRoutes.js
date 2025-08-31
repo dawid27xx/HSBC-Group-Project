@@ -5,17 +5,13 @@ const router = express.Router();
 const portfolioController = require('../controllers/portfolioController');
 
 // this publishes the controller functions as endpoints you can call
-router.get("/portfolio", auth, portfolioController.listAllPortfoliosCurrentUser);
-router.get("/asset/:portfolio_id",auth,  portfolioController.getAssetsInPortfolio);
-router.get("/asset/getPricesLastTwoYear/:ticker", auth, portfolioController.getPricesLastTwoYear);
-router.get("/asset/getPriceOfStock/:ticker", auth, portfolioController.getPriceOfStock);
-router.get("/portfolio/getPricesforPortfolio/:portfolio_id", auth, portfolioController.getPricesLastTwoYearForPortfolio)
-router.get("/portfolio/getCumulativePricesforPortfolio/:portfolio_id", portfolioController.getCumulativePortfolioValue)
-router.post("/portfolio", auth, portfolioController.addPortfolios);
-router.post("/asset", auth, portfolioController.addAssetToPortfolio);
-router.patch("/asset", auth, portfolioController.buySellOrder);
-router.get("/asset/getWeeklyChange/:ticker", auth, portfolioController.getWeeklyChangeForTicker);
-router.get("/portfolio/getWeeklyChange/:portfolio_id", auth, portfolioController.getWeeklyChangeForPortfolio);
+router.get("/portfolio", auth, portfolioController.listAllPortfoliosCurrentUser); // for index
+router.get("/asset/:portfolio_id",auth,  portfolioController.getAssetsInPortfolio); // everywhere
+router.get("/portfolio/getCumulativePricesforPortfolio/:portfolio_id", portfolioController.getCumulativePortfolioValue) // last two year charts
+router.post("/portfolio", auth, portfolioController.addPortfolios); // index
+router.post("/asset", auth, portfolioController.addAssetToPortfolio); // manage
+router.patch("/asset", auth, portfolioController.buySellOrder); // manage
+router.get("/portfolio/getWeeklyChange/:portfolio_id", auth, portfolioController.getWeeklyChangeForPortfolio); // everywhere
 
 
 module.exports = router;

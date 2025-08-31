@@ -8,8 +8,12 @@
 # }
 
 
-# GET http://localhost:3000/portfolio/portfolio HTTP/1.1
-# Content-Type: application/json
+
+GET http://localhost:3000/portfolio/portfolio/getWeeklyChange/1 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzU2NjQ4OTcwLCJleHAiOjE3NTY2NTI1NzB9.7Mi3LGgloTOPHKS1skYMuVk2ZLm467JjqPJMd0M6DxQ
+
+
 
 # GET http://localhost:3000/portfolio/asset/1 HTTP/1.1
 # Content-Type: application/json
