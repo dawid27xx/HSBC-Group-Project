@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (!portfolioId) {
-        alert('Error fetching portfolio.');
+    showModal('Error fetching portfolio.');
         window.location.href = '/index.html';
     } 
     
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => {
             console.error('Error fetching cumulative portfolio data:', error);
-            alert('Failed to load portfolio data.');
+            showModal('Failed to load portfolio data.');
         });
 
     // Fetch asset composition data for the donut chart
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => {
             console.error('Error fetching asset composition data:', error);
-            alert('Failed to load asset composition data.');
+            showModal('Failed to load asset composition data.');
         });
 
     const table2 = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
@@ -233,14 +233,13 @@ document.getElementById('addAssetForm').addEventListener('submit', function(even
     })
     .then(data => {
         if (data.success) {
-            // add info 
-            alert('Asset added successfully!');
+            showModal('Asset added successfully!', 'success');
         } else {
-            alert('Failed to add asset: ' + (data.error || 'Unknown error.'));
+            showModal('Failed to add asset: ' + (data.error || 'Unknown error.'));
         }
     })
     .catch(error => {
-        alert('An error occurred: ' + error.message);
+    showModal('An error occurred: ' + error.message);
     });
 });
 
@@ -267,13 +266,12 @@ document.getElementById('transactionForm').addEventListener('submit', function(e
     })
     .then(data => {
         if (data.success) {
-            // add info 
-            alert('Transaction made successfully!');
+            showModal('Transaction made successfully!', 'success');
         } else {
-            alert('Failed to make transaction: ' + (data.error || 'Unknown error.'));
+            showModal('Failed to make transaction: ' + (data.error || 'Unknown error.'));
         }
     })
     .catch(error => {
-        alert('An error occurred: ' + error.message);
+    showModal('An error occurred: ' + error.message);
     });
 });
