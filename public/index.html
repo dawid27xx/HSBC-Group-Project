@@ -11,6 +11,43 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <style>
+      /* Table header override */
+      #transactionTable thead th {
+        background-color: #212529 !important;
+        color: #fff !important;
+      }
+
+
+      /* Pulse effect on hover */
+      #transactionTable tbody tr {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+      }
+      #transactionTable tbody tr:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background-color: #f8f9fa !important;
+      }
+      
+
+      /* Buy = green, Sell = red */
+      .order-buy {
+        color: #198754 !important; /* Bootstrap green */
+        font-weight: 600;
+      }
+      .order-sell {
+        color: #dc3545 !important; /* Bootstrap red */
+        font-weight: 600;
+      }
+
+      /* Add subtle shadow to table */
+      #transactionTable {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+    </style>
   </head>
   <body>
     <nav class="navbar bg-dark">
@@ -143,296 +180,12 @@
         </div>
       </div>
     </div>
-
-    <!-- <footer class="bg-primary text-white text-center py-3">
-        <p>&copy; 2025 Portfolio Manager</p>
-    </footer> -->
+    <br><br><br><br>
 
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
-    <script>
-      // Populate username from JWT in localStorage
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const payload = jwt_decode(token);
-          if (payload.username) {
-            document.getElementById("username").textContent = payload.username;
-          }
-        } catch (e) {
-          console.error("Invalid token", e);
-        }
-      }
+    <script src="js/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-      const portfolioIds = [];
-      const portfolioNames = {};
-
-      // Fetch the portfolio IDs and names for the user
-      fetch("userPortfolio/userPortfolio", {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          data.forEach((pa) => {
-            portfolioIds.push(pa.portfolio_id);
-          });
-          fetchPortfolioDetails(); // Fetch portfolio details after we have IDs
-        })
-        .catch((err) =>
-          console.error("Error fetching user portfolio IDs:", err)
-        );
-
-      // Fetch portfolio details like name and exchange
-      const fetchPortfolioDetails = () => {
-        fetch(`/portfolio/portfolio`, {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            data.forEach((portfolio) => {
-              portfolioNames[portfolio.id] = portfolio.name; // Save portfolio names
-            });
-            // Fetch data for the first portfolio after loading portfolio details
-            fetchPortfolioData(portfolioIds[0], 0); // Start with the first portfolio
-          })
-          .catch((err) =>
-            console.error("Error fetching portfolio details:", err)
-          );
-      };
-
-      console.log(portfolioIds);
-
-      // Fetch portfolio data by portfolioId and update the chart
-      const fetchPortfolioData = (portfolioId, index) => {
-        fetch(
-          `portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`,
-          {
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-          }
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(`Data for Portfolio ${portfolioId}:`, data);
-            if (data && data.dates && data.values) {
-              updateChart(
-                data.dates,
-                data.values,
-                portfolioNames[portfolioId],
-                index
-              );
-            } else {
-              console.error(`No data for portfolio ${portfolioId}`);
-            }
-            // After processing, move to the next portfolio if it exists
-            if (portfolioIds[index + 1]) {
-              fetchPortfolioData(portfolioIds[index + 1], index + 1);
-            }
-          })
-          .catch((err) => {
-            console.error(
-              `Error fetching data for portfolio ${portfolioId}:`,
-              err
-            );
-          });
-      };
-
-      // Global variable for the chart
-      let chart = null;
-
-      // Function to update the chart with the data for each portfolio
-      const updateChart = (dates, values, portfolioName, index) => {
-        if (!chart) {
-          // Create the chart if it doesn't exist yet
-          chart = new Chart("netWorthChart", {
-            type: "line",
-            data: {
-              labels: dates, // Assuming all portfolios have the same dates
-              datasets: [
-                {
-                  label: portfolioName, // Use the portfolio name here
-                  backgroundColor: `rgba(${index * 50}, 123, 255, 0.2)`,
-                  borderColor: `rgba(${index * 50}, 123, 255, 1)`,
-                  data: values,
-                  fill: true,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              scales: {
-                x: {
-                  type: "category", // String-based months
-                  title: {
-                    display: true,
-                    text: "Date",
-                  },
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: "Net Worth (GBP)",
-                  },
-                },
-              },
-              plugins: {
-                legend: {
-                  display: true,
-                  position: "top",
-                },
-              },
-            },
-          });
-        } else {
-          // If chart already exists, just add the new dataset
-          chart.data.datasets.push({
-            label: portfolioName, // Use the portfolio name here
-            backgroundColor: `rgba(${index * 50}, 123, 255, 0.2)`,
-            borderColor: `rgba(${index * 50}, 123, 255, 1)`,
-            data: values,
-            fill: true,
-          });
-          chart.update(); // Update the chart
-        }
-      };
-
-      // Populate the Portfolio Table
-      // Populate the Portfolio Table
-      const table = document
-        .getElementById("portfolioTable")
-        .getElementsByTagName("tbody")[0];
-
-      console.log(`'Authorization': 'Bearer ' + ${token}`);
-
-      fetch(`/portfolio/portfolio`, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          data.forEach((p) => {
-            const newRow = table.insertRow();
-            const pName = newRow.insertCell(0);
-            const pExchange = newRow.insertCell(1);
-            const manageButton = newRow.insertCell(2);
-
-            pName.innerHTML = p.name;
-            pExchange.innerHTML = p.exchange;
-            // Set up the manage button with an onClick event
-            manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${p.id}, '${p.name}', '${p.exchange}')">Manage</button>
-`;
-          });
-        })
-        .catch((err) =>
-          console.error("Error fetching portfolio details:", err)
-        );
-
-      // Function to handle the Manage button click
-      function managePortfolio(id, name, exchange) {
-        // Store the portfolio ID in localStorage
-        localStorage.setItem("portfolioId", id);
-        localStorage.setItem("portfolioName", name);
-        localStorage.setItem("portfolioExchange", exchange);
-        // Redirect to manage.html
-        window.location.href = "manage.html";
-      }
-
-      // Handle Add Portfolio form submit
-      document
-        .getElementById("addPortfolioForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          const name = document.getElementById("portfolioName").value;
-          const exchange = document.getElementById("portfolioExchange").value;
-
-          fetch("/portfolio/portfolio", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + token,
-            },
-            body: JSON.stringify({ name, exchange }),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Failed to add portfolio");
-              }
-              return response.json();
-            })
-            .then((newPortfolio) => {
-              // Add the new portfolio to the table immediately
-              const table = document
-                .getElementById("portfolioTable")
-                .getElementsByTagName("tbody")[0];
-              const newRow = table.insertRow();
-              const pName = newRow.insertCell(0);
-              const pExchange = newRow.insertCell(1);
-              const manageButton = newRow.insertCell(2);
-
-              pName.textContent = newPortfolio.name;
-              pExchange.textContent = newPortfolio.exchange;
-              manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${newPortfolio.id}, '${newPortfolio.name}', '${newPortfolio.exchange}')">Manage</button>`;
-
-              // Clear form
-              document.getElementById("addPortfolioForm").reset();
-
-              // Hide the modal
-              const modal = bootstrap.Modal.getInstance(
-                document.getElementById("addPortfolioModal")
-              );
-              modal.hide();
-            })
-            .catch((err) => {
-              console.error("Error adding portfolio:", err);
-              alert("Could not add portfolio. Please try again.");
-            });
-        });
-
-      const table2 = document
-        .getElementById("transactionTable")
-        .getElementsByTagName("tbody")[0];
-
-      // update url
-      fetch(`/transaction/transaction`, {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          data = data.reverse();
-          data = data.slice(0, 5);
-
-          data.forEach((p) => {
-            // date we're getting: "datetime": "2025-08-29T09:01:28.000Z"
-            // new Date(date) <- converts it to standard format that js can understand
-            let date = new Date(p.datetime);
-            // options for formatting the date
-            const options = {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            };
-            // function that converts date objects to strings
-            date = date.toLocaleDateString("en-US", options);
-            const newRow = table2.insertRow();
-            const transactionType = newRow.insertCell(0);
-            const quantity = newRow.insertCell(1);
-            const dateTime = newRow.insertCell(2);
-            transactionType.innerHTML = p.transaction_type.toUpperCase();
-            quantity.innerHTML = p.quantity;
-            dateTime.innerHTML = date;
-          });
-        });
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

@@ -14,5 +14,8 @@ router.get("/portfolio/getCumulativePricesforPortfolio/:portfolio_id", portfolio
 router.post("/portfolio", auth, portfolioController.addPortfolios);
 router.post("/asset", auth, portfolioController.addAssetToPortfolio);
 router.patch("/asset", auth, portfolioController.buySellOrder);
+router.get("/asset/getWeeklyChange/:ticker", auth, portfolioController.getWeeklyChangeForTicker);
+router.get("/portfolio/getWeeklyChange/:portfolio_id", auth, portfolioController.getWeeklyChangeForPortfolio);
+
 
 module.exports = router;
