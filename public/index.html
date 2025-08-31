@@ -18,7 +18,6 @@
         color: #fff !important;
       }
 
-
       /* Pulse effect on hover */
       #transactionTable tbody tr {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -29,7 +28,6 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         background-color: #f8f9fa !important;
       }
-      
 
       /* Buy = green, Sell = red */
       .order-buy {
@@ -71,12 +69,14 @@
           <canvas id="netWorthChart"></canvas>
         </section>
         <section id="market-updates" class="col-md-4">
-          <div class="container">
+          <div class="container-fluid">
             <h2>Recent Transactions</h2>
-            <table class="table table-striped" id="transactionTable">
+            <table class="table table-striped w-100" id="transactionTable">
               <thead>
                 <tr>
-                  <th>Transaction type</th>
+                  <th>Portfolio</th>
+                  <th>Ticker</th>
+                  <th>Order type</th>
                   <th>Quantity</th>
                   <th>Date</th>
                 </tr>
@@ -86,10 +86,66 @@
           </div>
         </section>
       </div>
+      
     </main>
 
+    <!-- Add this just below your existing graph + transactions row -->
+    <div class="container my-4">
+      <div class="row">
+        <!-- Left column: Current Net Worth -->
+        <div class="col-md-4 mb-3"> 
+          <div class="card text-center border-dark shadow-sm h-100 bg-dark text-light">
+            <div class="card-body py-3 d-flex flex-column justify-content-center">
+              <h5 class="card-title text-info">Current Net Worth</h5>
+              <h2 id="netWorthValue" class="fw-bold text-success">$0</h2>
+            </div>
+          </div>
+        </div>
+        
+    
+        <!-- Right column: Economy Stats -->
+        <div class="col-md-8 mb-3">
+          <div class="card border-dark shadow-sm h-100">
+            <div class="card-header bg-dark text-light">
+              <h5 class="mb-0">Economy Stats</h5>
+            </div>
+            <div class="card-body py-3">
+              <div class="row row-cols-2 g-3">
+                <div class="col">
+                  <div class="p-3 bg-light border rounded text-center">
+                    <h6 class="text-muted">Inflation</h6>
+                    <p class="h6 fw-bold text-primary">3.2%</p>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="p-3 bg-light border rounded text-center">
+                    <h6 class="text-muted">Interest Rate</h6>
+                    <p class="h6 fw-bold text-success">5.25%</p>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="p-3 bg-light border rounded text-center">
+                    <h6 class="text-muted">CPI</h6>
+                    <p class="h6 fw-bold text-info">108.6</p>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="p-3 bg-light border rounded text-center">
+                    <h6 class="text-muted">GDP Growth</h6>
+                    <p class="h6 fw-bold text-dark">1.8%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+
     <div class="container">
-      <div class="container d-flex justify-content-between align-items-center">
+      <div class=" d-flex justify-content-between align-items-center">
         <h2 class="mb-0">Portfolios</h2>
         <button
           class="btn btn-outline-success"
@@ -105,11 +161,14 @@
           <tr>
             <th>Name</th>
             <th>Exchange</th>
+            <th>Value (USD)</th>
+            <th>1W Change</th>
             <th>Manage</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
+      
     </div>
 
     <!-- Add Portfolio Modal -->
@@ -180,7 +239,7 @@
         </div>
       </div>
     </div>
-    <br><br><br><br>
+    <br /><br /><br /><br />
 
     <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
     <script src="js/index.js"></script>

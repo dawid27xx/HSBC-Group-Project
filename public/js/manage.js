@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // ---- declare these BEFORE using them
   const token = localStorage.getItem("token");
   const portfolioId = localStorage.getItem("portfolioId");
   const portfolioName = localStorage.getItem("portfolioName");
@@ -32,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function buildWeeklyTicker() {
     const track = document.getElementById("weeklyTickerTrack");
-
+  
     const res = await fetch(
       `/portfolio/portfolio/getWeeklyChange/${portfolioId}`,
       {
@@ -40,36 +39,55 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     );
     if (!res.ok) return;
-
+  
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) {
       track.innerHTML = '<div class="ticker-item">No assets yet</div>';
       return;
     }
-
+  
+    let lastWeekChangeTotal = 0;   // ✅ keep as number
+    let totalStocks = 0;
+  
     const itemsHTML = data
       .map(({ ticker, changePct }) => {
-        const pct = Number(changePct).toFixed(2);
+        const pct = Number(changePct);
+        lastWeekChangeTotal += pct;   // ✅ sum as number
+        totalStocks += 1;
+  
+        const pctStr = pct.toFixed(2);
         const up = pct >= 0;
         const cls = up ? "badge-up" : "badge-down";
         const sign = up ? "+" : "";
         return `<div class="ticker-item">
             <span class="symbol">${ticker}</span>
-            <span class="${cls}">${sign}${pct}%</span>
+            <span class="${cls}">${sign}${pctStr}%</span>
           </div>`;
       })
       .join("");
-
+  
+    // ✅ compute average
+    let avgChange = totalStocks > 0 ? (lastWeekChangeTotal / totalStocks).toFixed(2) : "0.00";
+    const sign = avgChange >= 0 ? "+" : "";
+    const cls = avgChange >= 0 ? "order-buy" : "order-sell";
+  
+    document.getElementById("portfolioChangeWeek").innerHTML =
+      `<span class="${cls}">${sign}${avgChange}%</span>`;
+  
+    document.getElementById("portfolioStockCount").textContent = totalStocks;
+  
+    // ---- ticker scrolling
     let repeated = itemsHTML;
     while (track.scrollWidth < window.innerWidth * 2) {
       repeated += itemsHTML;
       track.innerHTML = repeated;
     }
-
+  
     const itemCount = track.querySelectorAll(".ticker-item").length;
     const duration = Math.min(60, Math.max(18, itemCount * 2.5));
     track.style.setProperty("--duration", `${duration}s`);
   }
+  
 
   buildWeeklyTicker();
 
@@ -83,6 +101,16 @@ document.addEventListener("DOMContentLoaded", function () {
     .then((data) => {
       if (data.dates && data.values) {
         renderCumulativeGrowthChart(data.dates, data.values);
+        const latest = data.values[data.values.length - 1]; // ✅ last element
+        const first = data.values[data.values.length - 12];                       // ✅ first element
+        const yearlyChange = ((latest - first) / first) * 100;
+
+        document.getElementById("portfolioValue").innerText = `$${latest.toLocaleString()}`;
+
+      
+        const el = document.getElementById("portfolioChangeYear");
+        el.innerHTML = `${yearlyChange >= 0 ? "+" : ""}${yearlyChange.toFixed(2)}%`;
+        el.classList.add(yearlyChange >= 0 ? "order-buy" : "order-sell");
       } else {
         console.error("Invalid data structure for cumulative portfolio value");
       }
@@ -360,6 +388,7 @@ document
     const transactionTypeElement = document.getElementById(
       "transactionTypeInput"
     );
+
     const transactionType =
       transactionTypeElement.options[transactionTypeElement.selectedIndex].text;
     const quantity = parseInt(
@@ -399,3 +428,5 @@ document
         alert("An error occurred: " + error.message);
       });
   });
+
+  

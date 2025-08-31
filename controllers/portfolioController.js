@@ -36,9 +36,11 @@ async function getAssetsInPortfolio(req, res) {
 
 async function buySellOrder(req, res) {
   try {
+    const userId = req.user.id;
     const { portfolio_id, ticker, transaction_type, quantity } = req.body;
     console.log(portfolio_id, ticker, transaction_type, quantity);
     const buySellOrder = await Portfolio.buySellOrder(
+      userId,
       portfolio_id,
       ticker,
       transaction_type,

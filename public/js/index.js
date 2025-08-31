@@ -13,39 +13,61 @@ if (token) {
 
 const portfolioIds = [];
 const portfolioNames = {};
+const assetTickers = {}; // key: portfolio_asset_id → value: ticker
 
+// Fetch user portfolio IDs
 fetch("userPortfolio/userPortfolio", {
   headers: { Authorization: "Bearer " + token },
 })
   .then((response) => response.json())
   .then((data) => {
     data.forEach((pa) => portfolioIds.push(pa.portfolio_id));
-    fetchPortfolioDetails();
+    fetchPortfolioDetails(); // continue once we have IDs
   })
   .catch((err) => console.error("Error fetching user portfolio IDs:", err));
 
-const fetchPortfolioDetails = () => {
+// Fetch portfolio details like name and exchange
+function fetchPortfolioDetails() {
   fetch(`/portfolio/portfolio`, {
     headers: { Authorization: "Bearer " + token },
   })
     .then((response) => response.json())
-    .then((data) => {
-      data.forEach((portfolio) => {
+    .then(async (data) => {
+      for (const portfolio of data) {
         portfolioNames[portfolio.id] = portfolio.name;
-      });
-      fetchPortfolioData(portfolioIds[0], 0);
+
+        // Fetch assets for each portfolio
+        const res = await fetch(`/portfolio/asset/${portfolio.id}`, {
+          headers: { Authorization: "Bearer " + token },
+        });
+        const assets = await res.json();
+        assets.forEach((a) => {
+          assetTickers[a.id] = a.ticker; // map asset_id → ticker
+        });
+      }
+
+      if (portfolioIds.length > 0) {
+        fetchPortfolioData(portfolioIds[0], 0);
+      }
+      fetchTransactions();
     })
     .catch((err) => console.error("Error fetching portfolio details:", err));
-};
+}
 
-const fetchPortfolioData = (portfolioId, index) => {
+// Fetch portfolio data for charts
+function fetchPortfolioData(portfolioId, index) {
   fetch(`/portfolio/portfolio/getCumulativePricesforPortfolio/${portfolioId}`, {
     headers: { Authorization: "Bearer " + token },
   })
     .then((response) => response.json())
     .then((data) => {
       if (data && data.dates && data.values) {
-        updateChart(data.dates, data.values, portfolioNames[portfolioId], index);
+        updateChart(
+          data.dates,
+          data.values,
+          portfolioNames[portfolioId],
+          index
+        );
       } else {
         console.error(`No data for portfolio ${portfolioId}`);
       }
@@ -53,11 +75,13 @@ const fetchPortfolioData = (portfolioId, index) => {
         fetchPortfolioData(portfolioIds[index + 1], index + 1);
       }
     })
-    .catch((err) => console.error(`Error fetching data for portfolio ${portfolioId}:`, err));
-};
+    .catch((err) =>
+      console.error(`Error fetching data for portfolio ${portfolioId}:`, err)
+    );
+}
 
 let chart = null;
-const updateChart = (dates, values, portfolioName, index) => {
+function updateChart(dates, values, portfolioName, index) {
   if (!chart) {
     chart = new Chart("netWorthChart", {
       type: "line",
@@ -92,29 +116,88 @@ const updateChart = (dates, values, portfolioName, index) => {
     });
     chart.update();
   }
-};
+}
 
+// Populate portfolio table
 const table = document
   .getElementById("portfolioTable")
   .getElementsByTagName("tbody")[0];
+
+let totalNetWorth = 0;
 
 fetch(`/portfolio/portfolio`, {
   headers: { Authorization: "Bearer " + token },
 })
   .then((response) => response.json())
-  .then((data) => {
-    data.forEach((p) => {
-      const newRow = table.insertRow();
-      const pName = newRow.insertCell(0);
-      const pExchange = newRow.insertCell(1);
-      const manageButton = newRow.insertCell(2);
+  .then(async (data) => {
+    // Process all portfolios in parallel and wait for all to finish
+    await Promise.all(
+      data.map(async (p) => {
+        const newRow = table.insertRow();
+        const pName = newRow.insertCell(0);
+        const pExchange = newRow.insertCell(1);
+        const pValue = newRow.insertCell(2);
+        const pChange = newRow.insertCell(3);
+        const manageButton = newRow.insertCell(4);
 
-      pName.textContent = p.name;
-      pExchange.textContent = p.exchange;
-      manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${p.id}, '${p.name}', '${p.exchange}')">Manage</button>`;
-    });
+        pName.textContent = p.name;
+        pExchange.textContent = p.exchange;
+        pValue.textContent = "…";
+        pChange.textContent = "…";
+        manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${p.id}, '${p.name}', '${p.exchange}')">Manage</button>`;
+
+        // Fetch current portfolio value
+        try {
+          const res = await fetch(
+            `/portfolio/portfolio/getCumulativePricesforPortfolio/${p.id}`,
+            { headers: { Authorization: "Bearer " + token } }
+          );
+          const valueData = await res.json();
+          if (valueData?.values?.length) {
+            const latestValue = valueData.values[valueData.values.length - 1];
+            pValue.textContent = `$${latestValue.toLocaleString()}`;
+            totalNetWorth += Number(latestValue) || 0;
+          } else {
+            pValue.textContent = "-";
+          }
+        } catch (err) {
+          console.error("Error fetching portfolio value:", err);
+          pValue.textContent = "-";
+        }
+
+        // Fetch weekly change %
+        try {
+          const res = await fetch(
+            `/portfolio/portfolio/getWeeklyChange/${p.id}`,
+            { headers: { Authorization: "Bearer " + token } }
+          );
+          const changeData = await res.json();
+          if (Array.isArray(changeData) && changeData.length > 0) {
+            const avgChange =
+              changeData.reduce((acc, item) => acc + (item.changePct || 0), 0) /
+              changeData.length;
+            const sign = avgChange >= 0 ? "+" : "";
+            pChange.textContent = `${sign}${avgChange.toFixed(2)}%`;
+            pChange.classList.add(avgChange >= 0 ? "order-buy" : "order-sell");
+          } else {
+            pChange.textContent = "-";
+          }
+        } catch (err) {
+          console.error("Error fetching weekly change:", err);
+          pChange.textContent = "-";
+        }
+      })
+    );
+
+    // Update the Net Worth card once everything is done
+    const netWorthEl = document.getElementById("netWorthValue");
+    if (netWorthEl) {
+      netWorthEl.textContent = `$${totalNetWorth.toLocaleString()}`;
+    }
   })
   .catch((err) => console.error("Error fetching portfolio details:", err));
+
+  
 
 function managePortfolio(id, name, exchange) {
   localStorage.setItem("portfolioId", id);
@@ -123,6 +206,7 @@ function managePortfolio(id, name, exchange) {
   window.location.href = "manage.html";
 }
 
+// Handle Add Portfolio form submit
 document
   .getElementById("addPortfolioForm")
   .addEventListener("submit", function (e) {
@@ -168,45 +252,54 @@ document
       });
   });
 
-const table2 = document
-  .getElementById("transactionTable")
-  .getElementsByTagName("tbody")[0];
+// ---- Transaction table population
+function fetchTransactions() {
+  const table2 = document
+    .getElementById("transactionTable")
+    .getElementsByTagName("tbody")[0];
 
-fetch(`/transaction/transaction`, {
-  headers: { Authorization: "Bearer " + token },
-})
-  .then((response) => response.json())
-  .then((data) => {
-    data = data.reverse().slice(0, 5);
-    data.forEach((p) => {
-        let date = new Date(p.datetime);
+  fetch(`/transaction/transaction`, {
+    headers: { Authorization: "Bearer " + token },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      data = data.reverse().slice(0, 5);
+
+      data.forEach((p) => {
+        let date = p.datetime ? new Date(p.datetime) : null;
         const options = {
-          year: "numeric",
+          day: "2-digit",
           month: "short",
-          day: "numeric",
           hour: "2-digit",
           minute: "2-digit",
         };
-        date = date.toLocaleDateString("en-US", options);
-      
+        const formattedDate = date
+          ? date.toLocaleDateString("en-GB", options) // UK-style shorter date
+          : "N/A";
+
         const newRow = table2.insertRow();
-        const transactionType = newRow.insertCell(0);
-        const quantity = newRow.insertCell(1);
-        const dateTime = newRow.insertCell(2);
-      
-        const type = p.transaction_type.toUpperCase();
-      
-        if (type === "BUY") {
-            transactionType.innerHTML = `<span class="badge bg-success">BUY</span>`;
-          } else if (type === "SELL") {
-            transactionType.innerHTML = `<span class="badge bg-danger">SELL</span>`;
-          } else {
-            transactionType.textContent = type;
-          }
-          
-      
-        quantity.textContent = p.quantity;
-        dateTime.textContent = date;
+
+        const portfolioCell = newRow.insertCell(0);
+        const tickerCell = newRow.insertCell(1);
+        const typeCell = newRow.insertCell(2);
+        const quantityCell = newRow.insertCell(3);
+        const dateCell = newRow.insertCell(4);
+
+        portfolioCell.textContent =
+          portfolioNames[p.portfolio_id] || `Portfolio #${p.portfolio_id}`;
+        tickerCell.textContent =
+          assetTickers[p.portfolio_asset_id] ||
+          `Asset #${p.portfolio_asset_id}`;
+        typeCell.textContent = p.transaction_type.toUpperCase();
+        quantityCell.textContent = p.quantity;
+        dateCell.textContent = formattedDate;
+
+        if (p.transaction_type.toUpperCase() === "BUY") {
+          typeCell.classList.add("order-buy");
+        } else if (p.transaction_type.toUpperCase() === "SELL") {
+          typeCell.classList.add("order-sell");
+        }
       });
-      
-  });
+    })
+    .catch((err) => console.error("Error fetching transactions:", err));
+}

@@ -100,6 +100,10 @@
         padding: 0.125rem 0.375rem;
         font-weight: 600;
       }
+      .bg-dark .text-muted {
+        color: rgba(255, 255, 255, 0.65) !important;
+      }
+      
     </style>
   </head>
 
@@ -136,6 +140,42 @@
           <div class="ticker__track" id="weeklyTickerTrack"></div>
         </div>
       </div>
+
+      <div class="row mt-4">
+        <!-- Portfolio Value -->
+        <div class="col-md-4 mb-3">
+          <div class="card text-center border-dark shadow-sm h-100 bg-dark text-light">
+            <div class="card-body py-3 d-flex flex-column justify-content-center">
+              <h5 class="card-title text-muted">Portfolio Value</h5>
+              <h2 id="portfolioValue" class="fw-bold text-info">$0</h2>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Portfolio Stats -->
+        <div class="col-md-8 mb-3">
+          <div class="card border-dark shadow-sm h-100 bg-dark text-light">
+            <div class="card-body">
+              <h5 class="card-title text-muted">Portfolio Stats</h5>
+              <div class="row text-center mt-3">
+                <div class="col-4">
+                  <h6 class="text-muted">Stocks</h6>
+                  <p id="portfolioStockCount" class="fw-bold">0</p>
+                </div>
+                <div class="col-4">
+                  <h6 class="text-muted">Last Week</h6>
+                  <p id="portfolioChangeWeek" class="fw-bold">0%</p>
+                </div>
+                <div class="col-4">
+                  <h6 class="text-muted">Last Year</h6>
+                  <p id="portfolioChangeYear" class="fw-bold">0%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
 
       <!-- Equal height cards -->
       <div class="row pb-4 align-items-stretch" id="mainPageContents">
