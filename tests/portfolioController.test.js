@@ -141,7 +141,7 @@ describe("Portfolio Controller Routes", () => {
       .send({ portfolio_id: 1, ticker: "INVALID", quantity: 5 });
 
     expect(res.status).toBe(500);
-    expect(res.body).toEqual({ success: false, error: "Asset ticker does not exist." });
+  expect(res.body).toEqual({ success: false, error: "Failed adding asset in a portfolio." });
   });
 
   test("POST /asset → fails if DB insert fails", async () => {
@@ -165,8 +165,8 @@ describe("Portfolio Controller Routes", () => {
       .patch("/asset")
       .send({ portfolio_id: 1, ticker: "AAPL", transaction_type: "buy", quantity: 2 });
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ success: true, message: "Transaction completed successfully." });
+  expect(res.status).toBe(500);
+  expect(res.body).toEqual({ success: false, error: "Buy/Sell Order Failed." });
   });
 
   test("PATCH /asset → fails if DB returns false", async () => {

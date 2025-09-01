@@ -48,11 +48,11 @@ async function listAllTransactionsPortfolioAsset(req, res) {
 // user_id, portfolio_asset_id, transaction_type, quantity, datetime
 async function addTransactions(req, res) {
     try {
-        const { user_id, portfolio_asset_id, portfolio_id, transaction_type, quantity } = req.body;
-        if (!user_id || !portfolio_asset_id || !portfolio_id || !transaction_type || !quantity) {
+        const { user_id, portfolio_asset_id, portfolio_id, transaction_type,  quantity, purchase_price } = req.body;
+        if (!user_id || !portfolio_asset_id || !portfolio_id || !transaction_type || !quantity || !purchase_price) {
             res.status(400).json({error: "Missing Values"});
         }
-        const addTransaction = await Transaction.addTransaction(user_id, portfolio_asset_id, portfolio_id, transaction_type, quantity);
+        const addTransaction = await Transaction.addTransaction(user_id, portfolio_asset_id, portfolio_id, transaction_type, quantity, purchase_price);
         res.status(200).send(addTransaction);
     } catch (err) {
         res.status(500).json({error: "Failed adding transaction", trace: err})

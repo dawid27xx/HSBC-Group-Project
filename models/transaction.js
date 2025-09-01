@@ -87,8 +87,6 @@ async function listAllTransactionsCurrentUser(user_id) {
 
 async function deleteAllByPortfolioAssetId(portfolio_asset_id) {
     try {
-        console.log("Here in deleteTrans")
-
         await Transaction.destroy({
             where: {
               portfolio_asset_id: portfolio_asset_id,

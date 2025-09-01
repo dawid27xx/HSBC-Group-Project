@@ -114,11 +114,12 @@ describe("Transaction Controller Routes", () => {
       portfolio_asset_id: 5,
       transaction_type: "buy",
       quantity: 10,
+      purchase_price: 100
     });
 
     const res = await request(app)
       .post("/transaction")
-      .send({ user_id: 123, portfolio_id: 77, portfolio_asset_id: 5, transaction_type: "buy", quantity: 10 });
+      .send({ user_id: 123, portfolio_id: 77, portfolio_asset_id: 5, transaction_type: "buy", quantity: 10, purchase_price: 100 });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
@@ -128,8 +129,9 @@ describe("Transaction Controller Routes", () => {
       portfolio_asset_id: 5,
       transaction_type: "buy",
       quantity: 10,
+      purchase_price: 100
     });
-    expect(Transaction.addTransaction).toHaveBeenCalledWith(123, 5, 77, "buy", 10);
+    expect(Transaction.addTransaction).toHaveBeenCalledWith(123, 5, 77, "buy", 10, 100);
   });
 
   test("POST /transaction → returns 400 if missing values", async () => {
@@ -146,7 +148,7 @@ describe("Transaction Controller Routes", () => {
 
     const res = await request(app)
       .post("/transaction")
-      .send({ user_id: 123, portfolio_id: 77, portfolio_asset_id: 5, transaction_type: "buy", quantity: 10 });
+      .send({ user_id: 123, portfolio_id: 77, portfolio_asset_id: 5, transaction_type: "buy", quantity: 10, purchase_price: 100 });
 
     expect(res.status).toBe(500);
     expect(res.body).toHaveProperty("error", "Failed adding transaction");

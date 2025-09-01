@@ -31,12 +31,19 @@ async function buySellOrder(req, res) {
   try {
     const userId = req.user.id;
     const { portfolio_id, ticker, transaction_type, quantity } = req.body;
+    console.log(portfolio_id, ticker, transaction_type, quantity);
+    
+    const quote = await yf.quote(ticker);
+    const { regularMarketPrice, currency } = quote;
+    const purchase_price = regularMarketPrice;
+    
     const buySellOrder = await Portfolio.buySellOrder(
       userId,
       portfolio_id,
       ticker,
       transaction_type,
-      quantity
+      quantity,
+      purchase_price
     );
     if (buySellOrder) {
       res.status(200).json({
@@ -54,13 +61,17 @@ async function buySellOrder(req, res) {
 async function addAssetToPortfolio(req, res) {
   try {
     const { portfolio_id, ticker, quantity } = req.body;
+    const quote = await yf.quote(ticker);
+    const { regularMarketPrice, currency } = quote;
+    const purchase_price = regularMarketPrice;
+
     const assetsForPortfolio = await Portfolio.addAssetToPortfolio(
       portfolio_id,
       ticker,
-      quantity
+      quantity,
+      purchase_price
     );
     if (assetsForPortfolio) {
-      const quote = await yf.quote(ticker);
       if (!quote) {
         res
           .status(500)
