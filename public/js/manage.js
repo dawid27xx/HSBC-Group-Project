@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (!portfolioId) {
-    alert("Error fetching portfolio.");
+    showModal("Error fetching portfolio.", "error");
     window.location.href = "/index.html";
     return;
   }
