@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch((error) => {
       console.error("Error fetching cumulative portfolio data:", error);
-      alert("Failed to load portfolio data.");
+      showModal("Failed to load portfolio data.", "error");
     });
 
   fetch(`portfolio/asset/${portfolioId}`, {
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch((error) => {
       console.error("Error fetching asset composition data:", error);
-      alert("Failed to load asset composition data.");
+      showModal("Failed to load asset composition data.", "error");
     });
 
   const table2 = document
@@ -321,7 +321,7 @@ document
       .toUpperCase();
 
     if (!ticker || !quantity || quantity <= 0) {
-      alert("Please enter a valid ticker and quantity.");
+      showModal("Please enter a valid ticker and quantity.", "error");
       return;
     }
 
@@ -340,7 +340,7 @@ document
       );
 
       if (alreadyExists) {
-        alert(`The asset ${ticker} already exists in this portfolio.`);
+        showModal(`The asset ${ticker} already exists in this portfolio.`, "error");
         return;
       }
 
@@ -362,14 +362,14 @@ document
       const data = await addRes.json();
 
       if (data.success) {
-        alert(`Asset ${ticker} added successfully!`);
+        showModal(`Asset ${ticker} added successfully!`, "success");
         document.getElementById("addAssetForm").reset();
       } else {
-        alert("Failed to add asset: " + (data.error || "Unknown error."));
+        showModal("Failed to add asset: " + (data.error || "Unknown error."), "error");
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred: " + err.message);
+      showModal("An error occurred: " + err.message, "error");
     }
   });
 
@@ -410,15 +410,13 @@ document
       })
       .then((data) => {
         if (data.success) {
-          alert("Transaction made successfully!");
+          showModal("Transaction made successfully!", "success");
         } else {
-          alert(
-            "Failed to make transaction: " + (data.error || "Unknown error.")
-          );
+          showModal("Failed to make transaction: " + (data.error || "Unknown error."), "error");
         }
       })
       .catch((error) => {
-        alert("An error occurred: " + error.message);
+        showModal("An error occurred: " + error.message, "error");
       });
   });
 
