@@ -1,6 +1,7 @@
 const Portfolio = require("../models/portfolio");
 const UserPortfolio = require("../models/userPortfolio");
 const PortfolioAsset = require("../models/portfolioAsset");
+const Transaction = require("../models/transaction");
 const yf = require("yahoo-finance2").default;
 
 // these functions use function defined in the model, and make them available to requests by the user
@@ -30,7 +31,6 @@ async function buySellOrder(req, res) {
   try {
     const userId = req.user.id;
     const { portfolio_id, ticker, transaction_type, quantity } = req.body;
-    console.log(portfolio_id, ticker, transaction_type, quantity);
     const buySellOrder = await Portfolio.buySellOrder(
       userId,
       portfolio_id,
@@ -51,7 +51,6 @@ async function buySellOrder(req, res) {
   }
 }
 
-
 async function addAssetToPortfolio(req, res) {
   try {
     const { portfolio_id, ticker, quantity } = req.body;
@@ -64,10 +63,13 @@ async function addAssetToPortfolio(req, res) {
       const quote = await yf.quote(ticker);
       if (!quote) {
         res
-        .status(500)
-        .json({ success: false, error: "Asset ticker does not exist." });
+          .status(500)
+          .json({ success: false, error: "Asset ticker does not exist." });
       } else {
-      res.status(200).json({ success: true, message: "Asset added successfully" })};
+        res
+          .status(200)
+          .json({ success: true, message: "Asset added successfully" });
+      }
     } else {
       res
         .status(500)
@@ -95,7 +97,16 @@ async function addPortfolios(req, res) {
       portfolioId
     );
 
-    const addAssetToPortfolio = await Portfolio.addAssetToPortfolio(portfolioId, ticker, quantity);
+    const quote = await yf.quote(ticker);
+    const { regularMarketPrice } = quote;
+    const price = regularMarketPrice;
+
+    const addAssetToPortfolio = await Portfolio.addAssetToPortfolio(
+      portfolioId,
+      ticker,
+      price,
+      quantity
+    );
 
     res.status(200).send(addPortfolio);
   } catch (err) {
@@ -140,130 +151,147 @@ async function getWeeklyChangeForPortfolio(req, res) {
   }
 }
 
+async function getDataForStockRange(portfolio_asset_id, dailyQuantities) {
+  const portAsset = await PortfolioAsset.PortfolioAsset.findOne({
+    where: { id: portfolio_asset_id },
+  });
+  const ticker = portAsset.ticker;
 
-// change this to get values between a range!
-async function getPricesLastTwoYearHelper(ticker) {
-  yf.suppressNotices(["yahooSurvey"]);
+  const dates = Object.keys(dailyQuantities);
+  if (dates.length === 0) {
+    return {}; // no transactions → no values
+  }
+
+  const period1 = new Date(dates[0]);
+  const period2 = new Date(dates[dates.length - 1]);
+
   const quote = await yf.chart(ticker, {
-    period1: "2023-08-01",
-    period2: "2025-08-01",
-    interval: "1mo",
-  });
-  const { quotes } = quote;
-  let dates = [];
-  let closes = [];
-
-  quotes.forEach((q) => {
-    dates.push(q.date);
-    closes.push(q.close);
+    period1,
+    period2,
+    interval: "1d",
   });
 
-  const formattedDates = dates.map((date) => {
-    const d = new Date(date);
-    const options = { year: "numeric", month: "short" };
-    return d.toLocaleDateString("en-US", options);
+  const prices = {};
+  quote.quotes.forEach((q) => {
+    const d = q.date.toISOString().split("T")[0];
+    prices[d] = q.close;
   });
 
-  result = [formattedDates, closes];
+  let totalValues = {};
+  let prevValue = 0;
 
-  return result;
+  for (const date of dates) {
+    if (prices[date]) {
+      prevValue = dailyQuantities[date] * prices[date];
+      totalValues[date] = prevValue;
+    } else {
+      totalValues[date] = prevValue;
+    }
+  }
+
+  return totalValues;
 }
 
-async function getCumulativeStockValue(ticker) {
-  // get transactions for stock in portfolio
 
-  // select * from transactions for current stock
-  // create array of quantities for each day 
+// for a stock in a portfolio
+async function getCumulativeStockValue(portfolio_asset_id, userId) {
+  const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
+  const transactionsByPortfolio = transactions.filter(
+    (t) => t.portfolio_asset_id == portfolio_asset_id
+  );
 
-  // extract earliest transaction on stock from query and store, 
-  // get current day and store
-  // get yahoo api prices between earliest transaction and current day -> [values, ..., values]
+  let dailyQuantities = {};
+  let currentQuantity = 0;
 
-  // multiply the two arrays (quantities and prices) using map
+  for (let i = 0; i < transactionsByPortfolio.length; i++) {
+    const t = transactionsByPortfolio[i];
+    const txDate = new Date(t.datetime);
 
-  // return list of days, resultof multiplication
+    if (t.transaction_type === "BUY") {
+      currentQuantity += t.quantity;
+    } else if (t.transaction_type === "SELL") {
+      currentQuantity -= t.quantity;
+    }
 
-  // quantity list first -> 
+    const nextDate =
+      i < transactionsByPortfolio.length - 1
+        ? new Date(transactionsByPortfolio[i + 1].datetime)
+        : new Date();
 
-  return 0
+    const diffDays = Math.ceil((nextDate - txDate) / (1000 * 60 * 60 * 24));
+
+    for (let j = 0; j < diffDays; j++) {
+      const day = new Date(txDate);
+      day.setDate(txDate.getDate() + j);
+      const dayKey = day.toISOString().split("T")[0];
+      dailyQuantities[dayKey] = currentQuantity;
+    }
+  }
+
+  return await getDataForStockRange(portfolio_asset_id, dailyQuantities);
 }
 
-//get data for graph
-// get transactions
-// get date of first transaction 
 async function getCumulativePortfolioValue(req, res) {
-
-  // for each stock call getCumulativeStockValue, store result in list of lists
-  // plot line for each stock, but also use js map to add all in the list of lists - this is the cumulative wealth
+  
   try {
     const { portfolio_id } = req.params;
+    const userId = req.user.id;
 
-    const assets = await Portfolio.getAssetsInPortfolio(portfolio_id);
+    const portAssets = await PortfolioAsset.PortfolioAsset.findAll({
+      where: { portfolio_id: portfolio_id },
+    });
 
-    let cumulativeValueByDate = {};
-    let allDates = [];
 
-    for (const asset of assets) {
-      const { ticker, quantity } = asset;
+    // extract just the IDs into a plain array
+    const assetIds = portAssets.map((asset) => asset.id);
 
-      const [dates, prices] = await getPricesLastTwoYearHelper(ticker);
+    let cumulative = {};
+    let allDates = new Set();
 
-      // updates dates only once
-      if (allDates.length === 0) {
-        allDates = dates;
-        dates.forEach((date) => {
-          cumulativeValueByDate[date] = 0;
-        });
-      }
+    // run cumulative stock calc for each asset
+    for (const assetId of assetIds) {
+      const valuesForAsset = await getCumulativeStockValue(assetId, userId);
 
-      for (let i = 0; i < dates.length; i++) {
-        const date = dates[i];
-        const price = prices[i];
-        const assetValue = price * quantity;
-        cumulativeValueByDate[date] += assetValue;
+      // merge into portfolio-level cumulative
+      for (const [date, val] of Object.entries(valuesForAsset)) {
+        if (!cumulative[date]) cumulative[date] = 0;
+        cumulative[date] += val;
+        allDates.add(date);
       }
     }
 
-    // dict into array
-    const responseDates = allDates;
-    const responseValues = responseDates.map(
-      (date) => cumulativeValueByDate[date]
-    );
+    // sort dates for output
+    const sortedDates = Array.from(allDates).sort();
+    const portfolioValues = sortedDates.map((d) => cumulative[d]);
 
     res.status(200).json({
-      dates: responseDates,
-      values: responseValues,
+      dates: sortedDates,
+      values: portfolioValues,
     });
   } catch (err) {
     console.error("Error in getCumulativePortfolioValue:", err);
-    res.status(500).json({ error: "Failed to compute portfolio value" });
+    res
+      .status(500)
+      .json({ error: "Failed to compute portfolio cumulative value" });
   }
 }
 
-// async function getPriceOfStock(req, res) {
-//   const { ticker } = req.params;
-//   console.log(ticker);
-//   try {
-//     const price = Portfolio.getPriceofStock(ticker);
-//     if (price == "Error") {
-//       res.status(500).send("Error getting stock price");
-//     } else {
-//       res.status(200).json({price: price});
-//     }
-//   } catch (err) {
-//     res.status(500).json({error: err})
-//   }
-// }
+async function getChanges(req, res) {
+  // here we will get the data for current networth, last week and last month. 
+  // return format should be something like this (networth, last week, last momth)
+  
+  // try to reuse older functions if possible
+}
 
 async function getPriceOfStock(req, res) {
-  const {ticker} = req.params;
-    try {
-        const quote = await yf.quote(ticker);
-        const { regularMarketPrice } = quote;
-        res.status(200).json({price: regularMarketPrice});
-    } catch(err) {
-      res.status(500).json({error: err})
-    }
+  const { ticker } = req.params;
+  try {
+    const quote = await yf.quote(ticker);
+    const { regularMarketPrice } = quote;
+    res.status(200).json({ price: regularMarketPrice });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
 }
 
 module.exports = {
@@ -274,5 +302,6 @@ module.exports = {
   listAllPortfoliosCurrentUser, //needed
   getAssetsInPortfolio, // neded
   getWeeklyChangeForPortfolio, /// needed
-  getPriceOfStock
+  getPriceOfStock,
+  getCumulativeStockValue,
 };
