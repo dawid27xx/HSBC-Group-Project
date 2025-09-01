@@ -59,9 +59,13 @@ async function addAssetToPortfolio(req, res) {
       quantity
     );
     if (assetsForPortfolio) {
-      res
-        .status(200)
-        .json({ success: true, message: "Asset added successfully" });
+      const quote = await yf.quote(ticker);
+      if (!quote) {
+        res
+        .status(500)
+        .json({ success: false, error: "Asset ticker does not exist." });
+      } else {
+      res.status(200).json({ success: true, message: "Asset added successfully" })};
     } else {
       res
         .status(500)
