@@ -4,7 +4,7 @@
   "description": "Project Description: [https://bitbucket.org/neuedamats/portfoliomanager/src/master/](https://bitbucket.org/neuedamats/portfoliomanager/src/master/)",
   "main": "app.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "repository": {
     "type": "git",
@@ -26,5 +26,9 @@
     "nodemon": "^3.1.10",
     "sequelize": "^6.37.7",
     "yahoo-finance2": "^2.13.3"
+  },
+  "devDependencies": {
+    "jest": "^30.1.2",
+    "supertest": "^7.1.4"
   }
 }
