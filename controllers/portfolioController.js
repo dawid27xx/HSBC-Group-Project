@@ -31,8 +31,11 @@ async function buySellOrder(req, res) {
     const { portfolio_id, ticker, transaction_type, quantity } = req.body;
     console.log(portfolio_id, ticker, transaction_type, quantity);
     
-    const quote = await yahooFinance.quote(ticker);
-    const { purchase_price, currency } = quote;
+    const quote = await yf.quote(ticker);
+    const { regularMarketPrice, currency } = quote;
+    const purchase_price = regularMarketPrice;
+    console.log("here");
+    console.log(regularMarketPrice);
     
     const buySellOrder = await Portfolio.buySellOrder(
       userId,
