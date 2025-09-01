@@ -77,7 +77,7 @@ async function addAssetToPortfolio(req, res) {
 async function addPortfolios(req, res) {
   try {
     let userId = req.user.id;
-    const { name, exchange } = req.body;
+    const { name, exchange, ticker, quantity } = req.body;
     if (!name || !exchange) {
       res.status(400).json({ error: "Missing Values" });
     }

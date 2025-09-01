@@ -216,6 +216,8 @@ document
 
     const name = document.getElementById("portfolioName").value;
     const exchange = document.getElementById("portfolioExchange").value;
+    const ticker = document.getElementById("tickerInput").value;
+    const quantity = document.getElementById("quantityInput").value;
 
     fetch("/portfolio/portfolio", {
       method: "POST",
@@ -223,7 +225,7 @@ document
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-      body: JSON.stringify({ name, exchange }),
+      body: JSON.stringify({ name, exchange, ticker, quantity }),
     })
       .then((response) => {
         if (!response.ok) throw new Error("Failed to add portfolio");
