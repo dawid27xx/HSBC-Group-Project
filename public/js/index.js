@@ -51,6 +51,7 @@ function fetchPortfolioDetails() {
       if (portfolioIds.length > 0) {
         fetchPortfolioData(portfolioIds[0], 0);
       }
+      // Always call fetchTransactions after portfolioNames and assetTickers are populated
       fetchTransactions();
     })
     .catch((err) => console.error("Error fetching portfolio details:", err));
@@ -216,6 +217,8 @@ document
 
     const name = document.getElementById("portfolioName").value;
     const exchange = document.getElementById("portfolioExchange").value;
+    const ticker = document.getElementById("tickerInput").value;
+    const quantity = document.getElementById("quantityInput").value;
 
     fetch("/portfolio/portfolio", {
       method: "POST",
@@ -223,7 +226,7 @@ document
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-      body: JSON.stringify({ name, exchange }),
+      body: JSON.stringify({ name, exchange, ticker, quantity }),
     })
       .then((response) => {
         if (!response.ok) throw new Error("Failed to add portfolio");
@@ -236,22 +239,50 @@ document
         const newRow = table.insertRow();
         const pName = newRow.insertCell(0);
         const pExchange = newRow.insertCell(1);
-        const manageButton = newRow.insertCell(2);
+        const pValue = newRow.insertCell(2);
+        const pChange = newRow.insertCell(3);
+        const manageButton = newRow.insertCell(4);
 
         pName.textContent = newPortfolio.name;
         pExchange.textContent = newPortfolio.exchange;
+        pValue.textContent = "-";
+        pChange.textContent = "-";
         manageButton.innerHTML = `<button class="btn btn-outline-dark" onclick="managePortfolio(${newPortfolio.id}, '${newPortfolio.name}', '${newPortfolio.exchange}')">Manage</button>`;
 
-        document.getElementById("addPortfolioForm").reset();
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById("addPortfolioModal")
-        );
-        modal.hide();
-      })
-      .catch((err) => {
-        console.error("Error adding portfolio:", err);
-        showModal("Could not add portfolio. Please try again.", "error");
-      });
+        // Fetch and update value
+        fetch(`/portfolio/portfolio/getCumulativePricesforPortfolio/${newPortfolio.id}`, {
+          headers: { Authorization: "Bearer " + token }
+        })
+          .then(res => res.json())
+          .then(valueData => {
+            if (valueData?.values?.length) {
+              const latestValue = valueData.values[valueData.values.length - 1];
+              pValue.textContent = `$${latestValue.toLocaleString()}`;
+            }
+          });
+
+  // Fetch and update weekly change
+  fetch(`/portfolio/portfolio/getWeeklyChange/${newPortfolio.id}`, {
+    headers: { Authorization: "Bearer " + token }
+  })
+    .then(res => res.json())
+    .then(changeData => {
+      if (Array.isArray(changeData) && changeData.length > 0) {
+        const avgChange =
+          changeData.reduce((acc, item) => acc + (item.changePct || 0), 0) /
+          changeData.length;
+        const sign = avgChange >= 0 ? "+" : "";
+        pChange.textContent = `${sign}${avgChange.toFixed(2)}%`;
+        pChange.classList.add(avgChange >= 0 ? "order-buy" : "order-sell");
+      }
+    });
+
+  document.getElementById("addPortfolioForm").reset();
+  const modal = bootstrap.Modal.getInstance(
+    document.getElementById("addPortfolioModal")
+  );
+  modal.hide();
+})
   });
 
 
@@ -303,4 +334,4 @@ function fetchTransactions() {
       });
     })
     .catch((err) => console.error("Error fetching transactions:", err));
-}
+};
