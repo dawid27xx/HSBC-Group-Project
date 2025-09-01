@@ -12,6 +12,7 @@ router.post("/portfolio", auth, portfolioController.addPortfolios); // index
 router.post("/asset", auth, portfolioController.addAssetToPortfolio); // manage
 router.patch("/asset", auth, portfolioController.buySellOrder); // manage
 router.get("/portfolio/getWeeklyChange/:portfolio_id", auth, portfolioController.getWeeklyChangeForPortfolio); // everywhere
+router.get("/assetPrice/:ticker", auth, portfolioController.getPriceOfStock)
 
 
 module.exports = router;

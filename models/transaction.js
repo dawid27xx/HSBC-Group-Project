@@ -49,6 +49,10 @@ const Transaction = sequelise.define(
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        purchase_price: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         datetime: {
             type: DataTypes.DATE,
             allowNull: false,
