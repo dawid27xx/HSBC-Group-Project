@@ -21,11 +21,25 @@ function showModal(message, type) {
         </div>
       </div>
     `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  // Add backdrop
+  const backdrop = document.createElement('div');
+  backdrop.id = 'modal-backdrop';
+  backdrop.style.position = 'fixed';
+  backdrop.style.top = '0';
+  backdrop.style.left = '0';
+  backdrop.style.width = '100vw';
+  backdrop.style.height = '100vh';
+  backdrop.style.background = 'rgba(0,0,0,0.7)';
+  backdrop.style.zIndex = '1040';
+  document.body.appendChild(backdrop);
 
-    // Remove modal on either close button click
-    document.getElementById('closeModalBtn').onclick =
-    document.getElementById('closeModalBtnFooter').onclick = function() {
-        document.getElementById('modal').remove();
-    };
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+  // Remove modal and backdrop on either close button click
+  const removeModal = function() {
+    document.getElementById('modal').remove();
+    backdrop.remove();
+  };
+  document.getElementById('closeModalBtn').onclick = removeModal;
+  document.getElementById('closeModalBtnFooter').onclick = removeModal;
 }
