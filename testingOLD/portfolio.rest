@@ -7,11 +7,14 @@
 #     "exchange": "LSEG"
 # }
 
-
-
-GET http://localhost:5000/portfolio/assetPrice/MSFT HTTP/1.1
+GET http://localhost:5000/portfolio/portfolio/getCumulativePricesforPortfolio/1 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzU2NzM3MDEzLCJleHAiOjE3NTY3NDA2MTN9.Ai_VV6SgtgqxVrTG_r4SgAFXIQAGeuhNoZmjxZ-xmM8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzU2NzU3NjY3LCJleHAiOjE3NTY3NjEyNjd9.-JuhC4DO5AjyNJAo_vXJOi5ePOYnidnM372dTE7VWqk
+
+
+# GET http://localhost:5000/portfolio/assetPrice/MSFT HTTP/1.1
+# Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzU2NzM3MDEzLCJleHAiOjE3NTY3NDA2MTN9.Ai_VV6SgtgqxVrTG_r4SgAFXIQAGeuhNoZmjxZ-xmM8
 
 
 

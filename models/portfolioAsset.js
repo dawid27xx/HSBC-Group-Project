@@ -73,7 +73,7 @@ async function deletePortfolioAsset(portfolio_asset_id) {
 
 // change this when Asset contains more attributes
 // delete if we are to add assets manually
-async function addPortfolioAsset(portfolio_id, ticker, quantity, purchase_price) {
+async function addPortfolioAsset(portfolio_id, ticker, purchase_price, quantity) {
     let user_id = 1;
     try {
         const newPortfolioAsset = await PortfolioAsset.create({
@@ -81,7 +81,8 @@ async function addPortfolioAsset(portfolio_id, ticker, quantity, purchase_price)
             ticker: ticker,
             quantity: quantity
         })
-        const newTransaction = await Transaction.addTransaction(user_id, portfolio_id, newPortfolioAsset.id, "buy", quantity, purchase_price);
+        let datenow = new Date();
+        const newTransaction = await Transaction.addTransaction(user_id, portfolio_id, newPortfolioAsset.id, "buy", purchase_price, quantity, datenow);
         console.log("PortfolioAsset Added")
         return newPortfolioAsset
     } catch (err) {

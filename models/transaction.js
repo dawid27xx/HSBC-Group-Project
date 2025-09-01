@@ -100,15 +100,16 @@ async function deleteAllByPortfolioAssetId(portfolio_asset_id) {
 
 // change this when Asset contains more attributes
 // delete if we are to add assets manually
-async function addTransaction(userId, portfolioId, portfolioAssetId, transactionType, quantity, purchasePrice) {
+async function addTransaction(user_id, portfolio_id, portfolio_asset_id, transaction_type, purchase_price, quantity, datetime) {
     try {
         const newTransaction = await Transaction.create({
-            user_id: userId,
-            portfolio_id: portfolioId,
-            portfolio_asset_id: portfolioAssetId,
-            transaction_type: transactionType,
-            purchase_price: purchasePrice,
-            quantity: quantity
+            user_id: user_id,
+            portfolio_id: portfolio_id,
+            portfolio_asset_id: portfolio_asset_id,
+            transaction_type: transaction_type,
+            purchase_price: purchase_price,
+            quantity: quantity,
+            datetime: datetime
         })
         console.log("Transaction Added")
         return newTransaction;
