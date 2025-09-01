@@ -62,7 +62,7 @@ async function addAssetToPortfolio(req, res) {
   try {
     const { portfolio_id, ticker, quantity } = req.body;
     const quote = await yf.quote(ticker);
-    const { regularMarketPrice, currency } = quote;
+    const { regularMarketPrice } = quote;
     const purchase_price = regularMarketPrice;
 
     const assetsForPortfolio = await Portfolio.addAssetToPortfolio(
@@ -162,54 +162,69 @@ async function getWeeklyChangeForPortfolio(req, res) {
   }
 }
 
+//// NEWS FUNCS HERE
+
 async function getDataForStockRange(portfolio_asset_id, dailyQuantities) {
   const portAsset = await PortfolioAsset.PortfolioAsset.findOne({
     where: { id: portfolio_asset_id },
   });
   const ticker = portAsset.ticker;
 
-  const dates = Object.keys(dailyQuantities);
-  if (dates.length === 0) {
-    return {}; // no transactions → no values
+  // 1) Ensure dates are sorted
+  const dates = Object.keys(dailyQuantities).sort();
+  if (dates.length === 0) return {};
+
+  const first = new Date(dates[0]);
+  const last = new Date(dates[dates.length - 1]);
+
+  // If period1 and period2 would be the same (same-day window),
+  // return the value keyed to the *last transaction day* (not "today").
+  if (!(last > first)) {
+    const lastDateKey = dates[dates.length - 1];
+    const qty = Number(dailyQuantities[lastDateKey] || 0);
+    const { regularMarketPrice = 0 } = await yf.quote(ticker);
+    return { [lastDateKey]: qty * regularMarketPrice };
   }
 
-  const period1 = new Date(dates[0]);
-  const period2 = new Date(dates[dates.length - 1]);
+  // 2) Make period2 exclusive by adding +1 day
+  const period1 = first;
+  const period2 = new Date(last.getTime() + 24 * 60 * 60 * 1000);
 
-  const quote = await yf.chart(ticker, {
+  const chart = await yf.chart(ticker, {
     period1,
     period2,
     interval: "1d",
   });
 
   const prices = {};
-  quote.quotes.forEach((q) => {
+  (chart.quotes || []).forEach((q) => {
     const d = q.date.toISOString().split("T")[0];
     prices[d] = q.close;
   });
 
-  let totalValues = {};
+  const totalValues = {};
   let prevValue = 0;
 
-  for (const date of dates) {
-    if (prices[date]) {
-      prevValue = dailyQuantities[date] * prices[date];
-      totalValues[date] = prevValue;
-    } else {
-      totalValues[date] = prevValue;
+  // Iterate in **sorted** order so carry-forward is correct
+  for (const d of dates) {
+    if (prices[d] != null) {
+      prevValue = Number(dailyQuantities[d]) * Number(prices[d]);
     }
+    totalValues[d] = prevValue; // carry forward over weekends/holidays
   }
 
   return totalValues;
 }
 
 
+
 // for a stock in a portfolio
 async function getCumulativeStockValue(portfolio_asset_id, userId) {
   const transactions = await Transaction.listAllTransactionsCurrentUser(userId);
-  const transactionsByPortfolio = transactions.filter(
-    (t) => t.portfolio_asset_id == portfolio_asset_id
-  );
+  const transactionsByPortfolio = transactions
+    .filter((t) => t.portfolio_asset_id == portfolio_asset_id)
+    // ensure chronological
+    .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
 
   let dailyQuantities = {};
   let currentQuantity = 0;
@@ -218,16 +233,14 @@ async function getCumulativeStockValue(portfolio_asset_id, userId) {
     const t = transactionsByPortfolio[i];
     const txDate = new Date(t.datetime);
 
-    if (t.transaction_type === "BUY") {
-      currentQuantity += t.quantity;
-    } else if (t.transaction_type === "SELL") {
-      currentQuantity -= t.quantity;
-    }
+    const type = (t.transaction_type || "").toUpperCase();
+    if (type === "BUY") currentQuantity += t.quantity;
+    else if (type === "SELL") currentQuantity -= t.quantity;
 
     const nextDate =
       i < transactionsByPortfolio.length - 1
         ? new Date(transactionsByPortfolio[i + 1].datetime)
-        : new Date();
+        : new Date(); // now
 
     const diffDays = Math.ceil((nextDate - txDate) / (1000 * 60 * 60 * 24));
 
@@ -255,6 +268,8 @@ async function getCumulativePortfolioValue(req, res) {
 
     // extract just the IDs into a plain array
     const assetIds = portAssets.map((asset) => asset.id);
+
+    console.log(assetIds);
 
     let cumulative = {};
     let allDates = new Set();
