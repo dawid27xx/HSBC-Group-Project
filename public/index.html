@@ -65,8 +65,8 @@
     <main class="container my-4">
       <div class="row">
         <section id="net-worth" class="col-md-8 mb-4">
-          <h2>Net Worth Over Time</h2>
-          <canvas id="netWorthChart"></canvas>
+            <h2>Net Worth Over Time</h2>
+            <canvas id="netWorthChart"></canvas>
         </section>
         <section id="market-updates" class="col-md-4">
           <div class="container-fluid">
@@ -76,7 +76,7 @@
                 <tr>
                   <th>Portfolio</th>
                   <th>Ticker</th>
-                  <th>Order type</th>
+                  <th>Order</th>
                   <th>Quantity</th>
                   <th>Date</th>
                 </tr>
@@ -97,8 +97,8 @@
             <div
               class="card-body py-3 d-flex flex-column justify-content-center"
             >
-              <h5 class="card-title text-info">Current Net Worth</h5>
-              <h2 id="netWorthValue" class="fw-bold text-success">$0</h2>
+              <h5 class="card-title text-light">Current Net Worth</h5>
+              <h2 id="netWorthValue" class="fw-bold text-info">$0</h2>
             </div>
           </div>
         </div>
@@ -142,10 +142,10 @@
     </div>
 
     <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center pb-3">
         <h2 class="mb-0">Portfolios</h2>
         <button
-          class="btn btn-outline-success"
+          class="btn btn-outline-primary"
           data-bs-toggle="modal"
           data-bs-target="#addPortfolioModal"
         >
@@ -153,8 +153,8 @@
         </button>
       </div>
 
-      <table class="table table-striped" id="portfolioTable">
-        <thead>
+      <table class="table table-striped rounded overflow-hidden" id="portfolioTable">
+        <thead class="table-dark">
           <tr>
             <th>Name</th>
             <th>Exchange</th>
