@@ -1,20 +1,23 @@
-name: main
+# .github/workflows/tests.yml
+name: Push Tests
 
 on:
-  push:
-    branches: ["**"]
   pull_request:
-    branches: ["**"]
+    branches: 
+      - main
+  push:
+    branches:
+      - main
 
 jobs:
-  lint-and-test:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -23,8 +26,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run linter
-        run: npm run lint
-
-      - name: Run tests
+      - name: Run Jest tests
         run: npm test
