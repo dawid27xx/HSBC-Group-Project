@@ -277,13 +277,13 @@ document
       }
     });
 
-  document.getElementById("addPortfolioForm").reset();
-  const modal = bootstrap.Modal.getInstance(
-    document.getElementById("addPortfolioModal")
-  );
-  modal.hide();
-})
-  });
+    document.getElementById("addPortfolioForm").reset();
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("addPortfolioModal")
+    );
+    modal.hide();
+  })
+});
 
 
 
