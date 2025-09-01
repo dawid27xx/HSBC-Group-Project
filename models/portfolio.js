@@ -47,7 +47,7 @@ async function listAllPortfolios() {
     }
 }
 
-async function buySellOrder(userId, portfolio_id, ticker, transaction_type, quantity) {
+async function buySellOrder(userId, portfolio_id, ticker, transaction_type, quantity, purchase_price) {
     let orderFulfilled = 0;
     let sellOffOrder = 0;
     try {
@@ -86,7 +86,7 @@ async function buySellOrder(userId, portfolio_id, ticker, transaction_type, quan
 
         if (orderFulfilled && !sellOffOrder) {
             try {
-                const newTransactionlog = await Transaction.addTransaction(userId, portfolio_id ,portfolioAsset.id, transaction_type, quantity);
+                const newTransactionlog = await Transaction.addTransaction(userId, portfolio_id ,portfolioAsset.id, transaction_type, quantity, purchase_price);
                 console.log("Transaction log created.")
                 return "Buy/Sell Order Success."
             } catch (err) {

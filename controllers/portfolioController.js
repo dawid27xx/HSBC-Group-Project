@@ -1,6 +1,5 @@
 const Portfolio = require("../models/portfolio");
 const UserPortfolio = require("../models/userPortfolio");
-const PortfolioAsset = require("../models/portfolioAsset");
 const yf = require("yahoo-finance2").default;
 
 // these functions use function defined in the model, and make them available to requests by the user
@@ -31,12 +30,17 @@ async function buySellOrder(req, res) {
     const userId = req.user.id;
     const { portfolio_id, ticker, transaction_type, quantity } = req.body;
     console.log(portfolio_id, ticker, transaction_type, quantity);
+    
+    const quote = await yahooFinance.quote(ticker);
+    const { purchase_price, currency } = quote;
+    
     const buySellOrder = await Portfolio.buySellOrder(
       userId,
       portfolio_id,
       ticker,
       transaction_type,
-      quantity
+      quantity,
+      purchase_price
     );
     if (buySellOrder) {
       res.status(200).json({
