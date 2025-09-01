@@ -7,38 +7,46 @@
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <div class="container vh-100 d-flex justify-content-center align-items-center">
+<body class="bg-dark">
+    <div class="container vh-100 d-flex flex-column justify-content-center align-items-center">
+        <div class="row w-100 justify-content-center mb-4">
+            <div class="col-12 text-center">
+                <img src="assets/logo.png" width="30%">
+                <h1 class="pt-2 text-light">Amplify Your Wealth.</h1>
+            </div>
+        </div>
         <div class="row w-100">
             <!-- Login Section -->
             <div class="col-md-6">
-                <div class="card p-4 shadow">
-                    <h1 class="text-center text-primary mb-4">Login</h1>
+                <div class="card p-4 shadow bg-dark border-light">
+                    <h3 class="text-light text-center"><i>Already a member?</i></h3>
+                    <h1 class="text-center text-light mb-4">Sign In</h1>
                     <form id="loginForm">
                         <div class="mb-3">
-                            <label for="loginUsername" class="form-label">Username</label>
+                            <label for="loginUsername" class="form-label text-light">Username</label>
                             <input type="text" class="form-control" id="loginUsername" placeholder="Enter your username" required>
                         </div>
                         <div class="mb-3">
-                            <label for="loginPassword" class="form-label">Password</label>
+                            <label for="loginPassword" class="form-label text-light">Password</label>
                             <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                        <button type="submit" class="btn btn-primary w-100">Sign In</button>
                     </form>
                 </div>
             </div>
 
             <!-- Register Section -->
             <div class="col-md-6">
-                <div class="card p-4 shadow">
-                    <h1 class="text-center text-success mb-4">Register</h1>
+                <div class="card p-4 shadow bg-dark border-light">
+                    <h3 class="text-light text-center"><i>New to Portman?</i></h3>
+                    <h1 class="text-center text-light mb-4">Register</h1>
                     <form id="registerForm" action="register.html">
                         <div class="mb-3">
-                            <label for="registerUsername" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="registerUsername" placeholder="Choose a username" required>
+                            <label for="registerUsername" class="form-label text-light">Username</label>
+                            <input type="text" class="form-control" id="registerUsername" placeholder="Choose a unique username" required>
                         </div>
                         <div class="mb-3">
-                            <label for="registerPassword" class="form-label">Password</label>
+                            <label for="registerPassword" class="form-label text-light">Password</label>
                             <input type="password" class="form-control" id="registerPassword" placeholder="Choose a password" required>
                         </div>
                         <button type="submit" class="btn btn-success w-100">Register</button>
