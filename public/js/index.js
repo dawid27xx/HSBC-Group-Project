@@ -250,7 +250,7 @@ document
       })
       .catch((err) => {
         console.error("Error adding portfolio:", err);
-        alert("Could not add portfolio. Please try again.");
+        showModal("Could not add portfolio. Please try again.", "error");
       });
   });
 
