@@ -14,7 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Invalid token", e);
       window.location.href = '/auth_page.html';
     }
-  }
+  } else {
+    window.location.href = '/auth_page.html'; 
+}
 
   if (!portfolioId) {
     showModal("Error fetching portfolio.", "error");

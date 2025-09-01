@@ -8,8 +8,9 @@ if (token) {
     }
   } catch (e) {
     console.error("Invalid token", e);
-    window.location.href = '/auth_page.html';
   }
+} else {
+  window.location.href = '/auth_page.html';
 }
 
 const portfolioIds = [];
