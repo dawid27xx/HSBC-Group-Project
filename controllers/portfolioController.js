@@ -115,8 +115,8 @@ async function addPortfolios(req, res) {
     const addAssetToPortfolio = await Portfolio.addAssetToPortfolio(
       portfolioId,
       ticker,
-      price,
-      quantity
+      quantity,
+      price
     );
 
     res.status(200).send(addPortfolio);
