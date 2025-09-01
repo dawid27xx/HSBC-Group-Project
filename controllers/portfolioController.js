@@ -51,6 +51,7 @@ async function buySellOrder(req, res) {
   }
 }
 
+
 async function addAssetToPortfolio(req, res) {
   try {
     const { portfolio_id, ticker, quantity } = req.body;
@@ -139,7 +140,8 @@ async function getWeeklyChangeForPortfolio(req, res) {
   }
 }
 
-// get last 2 years
+
+// change this to get values between a range!
 async function getPricesLastTwoYearHelper(ticker) {
   yf.suppressNotices(["yahooSurvey"]);
   const quote = await yf.chart(ticker, {
@@ -167,8 +169,32 @@ async function getPricesLastTwoYearHelper(ticker) {
   return result;
 }
 
-//get last two years used for graph
+async function getCumulativeStockValue(ticker) {
+  // get transactions for stock in portfolio
+
+  // select * from transactions for current stock
+  // create array of quantities for each day 
+
+  // extract earliest transaction on stock from query and store, 
+  // get current day and store
+  // get yahoo api prices between earliest transaction and current day -> [values, ..., values]
+
+  // multiply the two arrays (quantities and prices) using map
+
+  // return list of days, resultof multiplication
+
+  // quantity list first -> 
+
+  return 0
+}
+
+//get data for graph
+// get transactions
+// get date of first transaction 
 async function getCumulativePortfolioValue(req, res) {
+
+  // for each stock call getCumulativeStockValue, store result in list of lists
+  // plot line for each stock, but also use js map to add all in the list of lists - this is the cumulative wealth
   try {
     const { portfolio_id } = req.params;
 
@@ -214,6 +240,32 @@ async function getCumulativePortfolioValue(req, res) {
   }
 }
 
+// async function getPriceOfStock(req, res) {
+//   const { ticker } = req.params;
+//   console.log(ticker);
+//   try {
+//     const price = Portfolio.getPriceofStock(ticker);
+//     if (price == "Error") {
+//       res.status(500).send("Error getting stock price");
+//     } else {
+//       res.status(200).json({price: price});
+//     }
+//   } catch (err) {
+//     res.status(500).json({error: err})
+//   }
+// }
+
+async function getPriceOfStock(req, res) {
+  const {ticker} = req.params;
+    try {
+        const quote = await yf.quote(ticker);
+        const { regularMarketPrice } = quote;
+        res.status(200).json({price: regularMarketPrice});
+    } catch(err) {
+      res.status(500).json({error: err})
+    }
+}
+
 module.exports = {
   getCumulativePortfolioValue, // needed
   buySellOrder, // needed
@@ -222,4 +274,5 @@ module.exports = {
   listAllPortfoliosCurrentUser, //needed
   getAssetsInPortfolio, // neded
   getWeeklyChangeForPortfolio, /// needed
+  getPriceOfStock
 };

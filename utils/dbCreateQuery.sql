@@ -38,6 +38,7 @@ user_id INT NOT NULL,
 portfolio_id INT NOT NULL,
 portfolio_asset_id INT NOT NULL,
 transaction_type VARCHAR(255) NOT NULL,
+purchase_price INT NOT NULL,
 quantity INT NOT NULL,
 datetime DATETIME, 
 FOREIGN KEY (user_id) REFERENCES users(id),
@@ -57,7 +58,5 @@ VALUES (1, 1);
 INSERT INTO `PortfolioManager`.portfolioAssets (portfolio_id, ticker, quantity)
 VALUES (1, "MSFT", 5);
 
-INSERT INTO `PortfolioManager`.transactions (user_id, portfolio_id, portfolio_asset_id, transaction_type, quantity)
-VALUES (1, 1, 1, "Buy", 3);
 
 
