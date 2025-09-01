@@ -115,9 +115,9 @@ async function getAssetsInPortfolio(portfolio_id) {
     }
 }
 
-async function addAssetToPortfolio(portfolio_id, ticker, quantity) {
+async function addAssetToPortfolio(portfolio_id, ticker, quantity, purchase_price) {
     try {
-        const newAssetToPortfolio = await PortfolioAsset.addPortfolioAsset(portfolio_id, ticker, quantity);
+        const newAssetToPortfolio = await PortfolioAsset.addPortfolioAsset(portfolio_id, ticker, quantity, purchase_price);
         console.log("New Asset Added");
         return newAssetToPortfolio
     } catch (err) {

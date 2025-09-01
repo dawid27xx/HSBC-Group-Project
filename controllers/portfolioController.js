@@ -34,8 +34,6 @@ async function buySellOrder(req, res) {
     const quote = await yf.quote(ticker);
     const { regularMarketPrice, currency } = quote;
     const purchase_price = regularMarketPrice;
-    console.log("here");
-    console.log(regularMarketPrice);
     
     const buySellOrder = await Portfolio.buySellOrder(
       userId,
@@ -62,13 +60,17 @@ async function buySellOrder(req, res) {
 async function addAssetToPortfolio(req, res) {
   try {
     const { portfolio_id, ticker, quantity } = req.body;
+    const quote = await yf.quote(ticker);
+    const { regularMarketPrice, currency } = quote;
+    const purchase_price = regularMarketPrice;
+
     const assetsForPortfolio = await Portfolio.addAssetToPortfolio(
       portfolio_id,
       ticker,
-      quantity
+      quantity,
+      purchase_price
     );
     if (assetsForPortfolio) {
-      const quote = await yf.quote(ticker);
       if (!quote) {
         res
         .status(500)
