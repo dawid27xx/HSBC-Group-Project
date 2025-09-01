@@ -118,61 +118,87 @@ document.addEventListener("DOMContentLoaded", function () {
       showModal("Failed to load portfolio data.", "error");
     });
 
-  fetch(`portfolio/asset/${portfolioId}`, {
-    headers: {
-      Authorization: "Bearer " + token,
-    },
+// Map: portfolio_asset_id -> ticker
+let assetIdToTicker = {};
+
+const table2 = document
+  .getElementById("transactionTable")
+  .getElementsByTagName("tbody")[0];
+
+// Load assets → build map → then load transactions
+fetch(`/portfolio/asset/${portfolioId}`, {
+  headers: { Authorization: "Bearer " + token },
+})
+  .then((response) => response.json())
+  .then((assets) => {
+    if (Array.isArray(assets)) {
+      renderAssetCompositionChart(assets);
+      // Build the lookup { [asset.id]: asset.ticker }
+      assetIdToTicker = assets.reduce((acc, a) => {
+        acc[a.id] = (a.ticker || "").toUpperCase();
+        return acc;
+      }, {});
+    } else {
+      console.error("Invalid asset composition data");
+    }
+  })
+  .catch((error) => {
+    console.error("Error fetching asset composition data:", error);
+    showModal("Failed to load asset composition data.", "error");
+  })
+  .finally(loadTransactions); // ensure we render transactions even if assets failed
+
+function loadTransactions() {
+  fetch(`/transaction/transactionByPortfolio/${portfolioId}`, {
+    headers: { Authorization: "Bearer " + token },
   })
     .then((response) => response.json())
     .then((data) => {
-      if (data && Array.isArray(data)) {
-        renderAssetCompositionChart(data);
-      } else {
-        console.error("Invalid asset composition data");
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching asset composition data:", error);
-      showModal("Failed to load asset composition data.", "error");
-    });
+      // reverse newest-first as you had
+      data = Array.isArray(data) ? data.slice().reverse() : [];
 
-  const table2 = document
-    .getElementById("transactionTable")
-    .getElementsByTagName("tbody")[0];
-
-
-fetch(`/transaction/transactionByPortfolio/${portfolioId}`, {
-    headers: {
-        'Authorization': 'Bearer ' + token
-    }
-})
-.then(response => response.json())
-.then(data => {
-    data = data.reverse();
-
-    data.forEach((p) => { 
-        let date = new Date(p.datetime); 
-        const options = { year: 'numeric', month: 'short' , day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        date = date.toLocaleDateString('en-US', options);
+      data.forEach((p) => {
+        let date = new Date(p.datetime);
+        const options = {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        date = date.toLocaleDateString("en-US", options);
 
         const newRow = table2.insertRow();
-        const transactionType = newRow.insertCell(0);
-        const quantity = newRow.insertCell(1);
-        const dateTime = newRow.insertCell(2);
 
-        const type = p.transaction_type.toUpperCase();
+        // NEW: ticker cell first
+        const tickerCell = newRow.insertCell(0);
+        const transactionType = newRow.insertCell(1);
+        const quantity = newRow.insertCell(2);
+        const dateTime = newRow.insertCell(3);
+
+        // Lookup ticker via the portfolio_asset_id
+        const ticker =
+          assetIdToTicker[p.portfolio_asset_id] /* preferred */ ||
+          p.ticker /* in case you add it server-side later */ ||
+          "—";
+        tickerCell.textContent = ticker;
+
+        const type = (p.transaction_type || "").toUpperCase();
         transactionType.textContent = type;
 
-        if (type === "BUY") {
-            transactionType.classList.add("order-buy");
-        } else if (type === "SELL") {
-            transactionType.classList.add("order-sell");
-        }
+        if (type === "BUY") transactionType.classList.add("order-buy");
+        else if (type === "SELL") transactionType.classList.add("order-sell");
 
         quantity.textContent = p.quantity;
         dateTime.textContent = date;
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching transactions:", error);
+      showModal("Failed to load transactions.", "error");
     });
-})
+}
+
 
 });
 
