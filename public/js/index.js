@@ -8,6 +8,7 @@ if (token) {
     }
   } catch (e) {
     console.error("Invalid token", e);
+    window.location.href = '/auth_page.html';
   }
 }
 
@@ -277,13 +278,13 @@ document
       }
     });
 
-  document.getElementById("addPortfolioForm").reset();
-  const modal = bootstrap.Modal.getInstance(
-    document.getElementById("addPortfolioModal")
-  );
-  modal.hide();
-})
-  });
+    document.getElementById("addPortfolioForm").reset();
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("addPortfolioModal")
+    );
+    modal.hide();
+  })
+});
 
 
 
