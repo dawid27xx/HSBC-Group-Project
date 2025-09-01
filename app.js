@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config({path: './.env'});
 const app = express();
 const userRoutes = require('./routes/userRoutes')
@@ -7,6 +8,11 @@ const portfolioAssetsRoutes = require('./routes/portfolioAssetRoutes')
 const transactionRoutes = require('./routes/transactionRoutes')
 const userPortfolio = require('./routes/userPortfolioRoutes')
 
+
+app.use(cors({
+	origin: 'http://localhost:3000',
+	credentials: true
+}));
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -17,7 +23,7 @@ app.use('/transaction', transactionRoutes);
 app.use('/userPortfolio', userPortfolio)
 
 
-const PORT = 3000;
+const PORT = 5000;
 
 app.listen(PORT, () => {
 console.log(`Server running at http://localhost:${PORT}/`);
