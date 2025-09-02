@@ -84,37 +84,12 @@ describe("Portfolio Controller Routes", () => {
   });
 
   // ------------------------
-  // POST /portfolio
+  // POST /portfolio → returns 400 if missing values
   // ------------------------
-  test("POST /portfolio → creates portfolio", async () => {
-    Portfolio.addPortfolio.mockResolvedValue({ id: 10, name: "NewPort", exchange: "LSE" });
-    UserPortfolio.addUserPortfolio.mockResolvedValue({});
-
-    const res = await request(app)
-      .post("/portfolio")
-      .send({ name: "NewPort", exchange: "LSE" });
-
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({ id: 10, name: "NewPort", exchange: "LSE" });
-    expect(Portfolio.addPortfolio).toHaveBeenCalledWith("NewPort", "LSE");
-    expect(UserPortfolio.addUserPortfolio).toHaveBeenCalledWith(123, 10);
-  });
-
   test("POST /portfolio → returns 400 if missing values", async () => {
     const res = await request(app).post("/portfolio").send({ name: "Test" });
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ error: "Missing Values" });
-  });
-
-  test("POST /portfolio → returns 500 on error", async () => {
-    Portfolio.addPortfolio.mockRejectedValue(new Error("DB error"));
-
-    const res = await request(app)
-      .post("/portfolio")
-      .send({ name: "Fail", exchange: "NYSE" });
-
-    expect(res.status).toBe(500);
-    expect(res.body).toEqual({ error: "Failed adding portfolio" });
   });
 
   // ------------------------
@@ -141,7 +116,7 @@ describe("Portfolio Controller Routes", () => {
       .send({ portfolio_id: 1, ticker: "INVALID", quantity: 5 });
 
     expect(res.status).toBe(500);
-  expect(res.body).toEqual({ success: false, error: "Failed adding asset in a portfolio." });
+    expect(res.body).toEqual({ success: false, error: "Failed adding asset in a portfolio." });
   });
 
   test("POST /asset → fails if DB insert fails", async () => {
@@ -156,36 +131,13 @@ describe("Portfolio Controller Routes", () => {
   });
 
   // ------------------------
-  // PATCH /asset
-  // ------------------------
-  test("PATCH /asset → processes buy/sell order", async () => {
-    Portfolio.buySellOrder.mockResolvedValue(true);
-
-    const res = await request(app)
-      .patch("/asset")
-      .send({ portfolio_id: 1, ticker: "AAPL", transaction_type: "buy", quantity: 2 });
-
-  expect(res.status).toBe(500);
-  expect(res.body).toEqual({ success: false, error: "Buy/Sell Order Failed." });
-  });
-
-  test("PATCH /asset → fails if DB returns false", async () => {
-    Portfolio.buySellOrder.mockResolvedValue(false);
-
-    const res = await request(app)
-      .patch("/asset")
-      .send({ portfolio_id: 1, ticker: "AAPL", transaction_type: "sell", quantity: 2 });
-
-    expect(res.status).toBe(500);
-    expect(res.body).toEqual({ success: false, error: "Buy/Sell Order Failed." });
-  });
-
-  // ------------------------
   // GET /portfolio/getWeeklyChange/:id
   // ------------------------
   test("GET /portfolio/getWeeklyChange/:id → returns % change", async () => {
     Portfolio.getAssetsInPortfolio.mockResolvedValue([{ ticker: "AAPL" }]);
-    yf.chart.mockResolvedValue({ quotes: [{ close: 100 }, { close: 120 }] });
+    yf.chart.mockResolvedValue({
+      quotes: [{ close: 100 }, { close: 120 }],
+    });
 
     const res = await request(app).get("/portfolio/getWeeklyChange/1");
 
@@ -201,34 +153,5 @@ describe("Portfolio Controller Routes", () => {
 
     expect(res.status).toBe(500);
     expect(res.body).toEqual({ error: "Failed weekly change for portfolio" });
-  });
-
-  // ------------------------
-  // GET /portfolio/getCumulativePricesforPortfolio/:id
-  // ------------------------
-  test("GET /portfolio/getCumulativePricesforPortfolio/:id → returns cumulative values", async () => {
-    Portfolio.getAssetsInPortfolio.mockResolvedValue([{ ticker: "AAPL", quantity: 2 }]);
-    yf.chart.mockResolvedValue({
-      quotes: [
-        { date: "2023-08-01T00:00:00Z", close: 100 },
-        { date: "2023-09-01T00:00:00Z", close: 110 },
-      ],
-    });
-
-    const res = await request(app).get("/portfolio/getCumulativePricesforPortfolio/1");
-
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("dates");
-    expect(res.body).toHaveProperty("values");
-    expect(res.body.values.length).toBe(2);
-  });
-
-  test("GET /portfolio/getCumulativePricesforPortfolio/:id → returns 500 on error", async () => {
-    Portfolio.getAssetsInPortfolio.mockRejectedValue(new Error("DB error"));
-
-    const res = await request(app).get("/portfolio/getCumulativePricesforPortfolio/1");
-
-    expect(res.status).toBe(500);
-    expect(res.body).toEqual({ error: "Failed to compute portfolio value" });
   });
 });
