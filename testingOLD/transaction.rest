@@ -12,9 +12,9 @@
 # GET http://localhost:3000/transaction/transaction HTTP/1.1
 # Content-Type: application/json
 
-GET http://localhost:5000/transaction/transactionByPortfolio/1 HTTP/1.1
+GET http://localhost:5000/transaction/transactionByPortfolio/2 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzU2NzQ3MDY5LCJleHAiOjE3NTY3NTA2Njl9.1tTEMahfEf69vOzyln-TP2ErZW1SI-bes9fTgXfljcA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzU2Nzk0NDgxLCJleHAiOjE3NTY3OTgwODF9.OLBOeV25BvCfeag5j0r9_PngLdulFLmC2zQ3gV1rSb8
 
 
 # GET http://localhost:3000/transaction/transactionByPortfolioAsset/3 HTTP/1.1
