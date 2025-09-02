@@ -1,0 +1,318 @@
+openapi: 3.0.3
+info:
+  title: Portfolio Manager API
+  version: 1.0.0
+  description: API documentation for managing users, portfolios, assets, and transactions.
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+tags:
+  - name: Users
+  - name: Portfolios
+  - name: UserPortfolios
+  - name: PortfolioAssets
+  - name: Transactions
+
+paths:
+  # ----------------------
+  # Users (/auth)
+  # ----------------------
+  /auth/users:
+    get:
+      tags: [Users]
+      summary: List all users
+      responses:
+        "200":
+          description: List of users
+
+  /auth/register:
+    post:
+      tags: [Users]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        "200": { description: User created }
+
+  /auth/login:
+    post:
+      tags: [Users]
+      summary: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        "200": { description: JWT token }
+
+  # ----------------------
+  # Portfolios (/portfolio)
+  # ----------------------
+  /portfolio/portfolio:
+    get:
+      tags: [Portfolios]
+      summary: Get all portfolios for current user
+      security: [ { bearerAuth: [] } ]
+      responses:
+        "200": { description: List of portfolios }
+    post:
+      tags: [Portfolios]
+      summary: Create a new portfolio
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, exchange]
+              properties:
+                name: { type: string }
+                exchange: { type: string }
+      responses:
+        "200": { description: Portfolio created }
+
+  /portfolio/asset/{portfolio_id}:
+    get:
+      tags: [Portfolios]
+      summary: Get assets in a portfolio
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - in: path
+          name: portfolio_id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Assets in portfolio }
+
+  /portfolio/asset:
+    post:
+      tags: [Portfolios]
+      summary: Add asset to portfolio
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [portfolio_id, ticker, quantity]
+              properties:
+                portfolio_id: { type: integer }
+                ticker: { type: string }
+                quantity: { type: integer }
+      responses:
+        "200": { description: Asset added }
+    patch:
+      tags: [Portfolios]
+      summary: Process buy/sell order
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [portfolio_id, ticker, transaction_type, quantity]
+              properties:
+                portfolio_id: { type: integer }
+                ticker: { type: string }
+                transaction_type: { type: string, enum: [buy, sell] }
+                quantity: { type: integer }
+      responses:
+        "200": { description: Order processed }
+
+  /portfolio/portfolio/getCumulativePricesforPortfolio/{portfolio_id}:
+    get:
+      tags: [Portfolios]
+      summary: Get cumulative values for portfolio
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - in: path
+          name: portfolio_id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Dates and values }
+
+  /portfolio/portfolio/getWeeklyChange/{portfolio_id}:
+    get:
+      tags: [Portfolios]
+      summary: Get weekly % change for a portfolio
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - in: path
+          name: portfolio_id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Weekly change data }
+
+  /portfolio/assetPrice/{ticker}:
+    get:
+      tags: [Portfolios]
+      summary: Get current stock price
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - in: path
+          name: ticker
+          required: true
+          schema: { type: string }
+      responses:
+        "200": { description: Current price }
+
+  /portfolio/stock/pastPerformance/{portfolio_asset_id}:
+    get:
+      tags: [Portfolios]
+      summary: Get stock performance for asset
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - in: path
+          name: portfolio_asset_id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Past performance data }
+
+  # ----------------------
+  # UserPortfolios (/userPortfolio)
+  # ----------------------
+  /userPortfolio/userPortfolio:
+    get:
+      tags: [UserPortfolios]
+      summary: Get user portfolios
+      security: [ { bearerAuth: [] } ]
+      responses:
+        "200": { description: User portfolio list }
+    post:
+      tags: [UserPortfolios]
+      summary: Link user to portfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, portfolio_id]
+              properties:
+                user_id: { type: integer }
+                portfolio_id: { type: integer }
+      responses:
+        "200": { description: UserPortfolio created }
+
+  # ----------------------
+  # PortfolioAssets (/portfolioAsset)
+  # ----------------------
+  /portfolioAsset/portfolioAsset:
+    get:
+      tags: [PortfolioAssets]
+      summary: Get all portfolio assets
+      responses:
+        "200": { description: List of assets }
+    post:
+      tags: [PortfolioAssets]
+      summary: Add a portfolio asset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [portfolio_id, ticker, quantity]
+              properties:
+                portfolio_id: { type: integer }
+                ticker: { type: string }
+                quantity: { type: integer }
+      responses:
+        "200": { description: Asset created }
+
+  /portfolioAsset/portfolioAsset/{portfolio_asset_id}:
+    delete:
+      tags: [PortfolioAssets]
+      summary: Delete a portfolio asset
+      parameters:
+        - in: path
+          name: portfolio_asset_id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Asset deleted }
+
+  # ----------------------
+  # Transactions (/transaction)
+  # ----------------------
+  /transaction/transaction:
+    get:
+      tags: [Transactions]
+      summary: List all transactions for current user
+      security: [ { bearerAuth: [] } ]
+      responses:
+        "200": { description: List of transactions }
+    post:
+      tags: [Transactions]
+      summary: Add transaction
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [portfolio_id, portfolio_asset_id, transaction_type, quantity, purchase_price]
+              properties:
+                portfolio_id: { type: integer }
+                portfolio_asset_id: { type: integer }
+                transaction_type: { type: string }
+                quantity: { type: integer }
+                purchase_price: { type: number }
+      responses:
+        "200": { description: Transaction created }
+
+  /transaction/transactionByPortfolio/{portfolio_id}:
+    get:
+      tags: [Transactions]
+      summary: Get transactions for portfolio
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - in: path
+          name: portfolio_id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Transactions for portfolio }
+
+  /transaction/transactionByPortfolioAsset/{portfolio_asset_id}:
+    get:
+      tags: [Transactions]
+      summary: Get transactions for portfolio asset
+      security: [ { bearerAuth: [] } ]
+      parameters:
+        - in: path
+          name: portfolio_asset_id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200": { description: Transactions for portfolio asset }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

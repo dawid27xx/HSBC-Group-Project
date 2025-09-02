@@ -8,6 +8,11 @@ const portfolioAssetsRoutes = require('./routes/portfolioAssetRoutes')
 const transactionRoutes = require('./routes/transactionRoutes')
 const userPortfolio = require('./routes/userPortfolioRoutes')
 
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const swaggerDocument = YAML.load("./swagger.yaml");
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(cors({
 	origin: 'http://localhost:3000',
