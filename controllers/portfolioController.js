@@ -165,56 +165,65 @@ async function getWeeklyChangeForPortfolio(req, res) {
 //// NEWS FUNCS HERE
 
 async function getDataForStockRange(portfolio_asset_id, dailyQuantities) {
+  // Look up the asset + ticker
   const portAsset = await PortfolioAsset.PortfolioAsset.findOne({
     where: { id: portfolio_asset_id },
   });
+  if (!portAsset) {
+    // Nothing to price if the asset isn't found
+    return {};
+  }
   const ticker = portAsset.ticker;
 
-  // 1) Ensure dates are sorted
+  // Work with a sorted list of YYYY-MM-DD keys
   const dates = Object.keys(dailyQuantities).sort();
   if (dates.length === 0) return {};
 
   const first = new Date(dates[0]);
   const last = new Date(dates[dates.length - 1]);
 
-  // If period1 and period2 would be the same (same-day window),
-  // return the value keyed to the *last transaction day* (not "today").
-  if (!(last > first)) {
-    const lastDateKey = dates[dates.length - 1];
-    const qty = Number(dailyQuantities[lastDateKey] || 0);
-    const { regularMarketPrice = 0 } = await yf.quote(ticker);
-    return { [lastDateKey]: qty * regularMarketPrice };
-  }
-
-  // 2) Make period2 exclusive by adding +1 day
+  // Always make period2 exclusive (+1 day) to avoid period1==period2 issues
   const period1 = first;
   const period2 = new Date(last.getTime() + 24 * 60 * 60 * 1000);
 
+  // Fetch daily candles
   const chart = await yf.chart(ticker, {
     period1,
     period2,
     interval: "1d",
   });
 
+  // Map of date(YYYY-MM-DD) -> close price
   const prices = {};
   (chart.quotes || []).forEach((q) => {
     const d = q.date.toISOString().split("T")[0];
     prices[d] = q.close;
   });
 
-  const totalValues = {};
-  let prevValue = 0;
-
-  // Iterate in **sorted** order so carry-forward is correct
-  for (const d of dates) {
-    if (prices[d] != null) {
-      prevValue = Number(dailyQuantities[d]) * Number(prices[d]);
+  // If there's no candle for the *last* date (e.g., today), try live quote
+  const lastDateKey = dates[dates.length - 1];
+  if (prices[lastDateKey] == null) {
+    try {
+      const { regularMarketPrice } = await yf.quote(ticker);
+      if (regularMarketPrice != null) prices[lastDateKey] = regularMarketPrice;
+    } catch {
+      // ignore; we'll just carry forward the last known candle below
     }
-    totalValues[d] = prevValue; // carry forward over weekends/holidays
+  }
+
+  // Build total values, carrying forward last known price on missing-price days
+  const totalValues = {};
+  let lastKnownPrice = null;
+
+  for (const d of dates) {
+    if (prices[d] != null) lastKnownPrice = prices[d];
+    totalValues[d] =
+      lastKnownPrice != null ? Number(dailyQuantities[d]) * Number(lastKnownPrice) : 0;
   }
 
   return totalValues;
 }
+
 
 
 
@@ -252,55 +261,65 @@ async function getCumulativeStockValue(portfolio_asset_id, userId) {
     }
   }
 
+  console.log(portfolio_asset_id, dailyQuantities);
+
   return await getDataForStockRange(portfolio_asset_id, dailyQuantities);
 }
 
 async function getCumulativePortfolioValue(req, res) {
-  
   try {
     const { portfolio_id } = req.params;
     const userId = req.user.id;
 
     const portAssets = await PortfolioAsset.PortfolioAsset.findAll({
-      where: { portfolio_id: portfolio_id },
+      where: { portfolio_id },
     });
 
-
-    // extract just the IDs into a plain array
-    const assetIds = portAssets.map((asset) => asset.id);
-
-    console.log(assetIds);
-
-    let cumulative = {};
-    let allDates = new Set();
-
-    // run cumulative stock calc for each asset
-    for (const assetId of assetIds) {
-      const valuesForAsset = await getCumulativeStockValue(assetId, userId);
-
-      // merge into portfolio-level cumulative
-      for (const [date, val] of Object.entries(valuesForAsset)) {
-        if (!cumulative[date]) cumulative[date] = 0;
-        cumulative[date] += val;
-        allDates.add(date);
-      }
+    const assetIds = portAssets.map(a => a.id);
+    if (!assetIds.length) {
+      return res.status(200).json({ dates: [], values: [] });
     }
 
-    // sort dates for output
-    const sortedDates = Array.from(allDates).sort();
-    const portfolioValues = sortedDates.map((d) => cumulative[d]);
+    // 1) get per-asset series & collect union of dates
+    const perAssetSeries = [];
+    const unionDatesSet = new Set();
 
-    res.status(200).json({
-      dates: sortedDates,
-      values: portfolioValues,
+    for (const assetId of assetIds) {
+      const series = await getCumulativeStockValue(assetId, userId); // {date: value}
+      perAssetSeries.push(series);
+      for (const d of Object.keys(series)) unionDatesSet.add(d);
+    }
+
+    const sortedDates = Array.from(unionDatesSet).sort();
+
+    // 2) forward-fill each asset on the union axis
+    const ffSeriesList = perAssetSeries.map(series => {
+      let last = 0;
+      const ff = {};
+      for (const d of sortedDates) {
+        const v = series[d];
+        if (v != null && !Number.isNaN(v)) last = Number(v);
+        ff[d] = last; // carry-forward
+      }
+      return ff;
     });
+
+    // 3) sum per date
+    const portfolioValues = sortedDates.map(d =>
+      ffSeriesList.reduce((sum, s) => sum + (s[d] ?? 0), 0)
+    );
+
+    // (Optional) debug to confirm what changed
+    // console.log("[Cumulative] dates:", sortedDates.slice(-5));
+    // console.log("[Cumulative] last values per asset:", ffSeriesList.map(s => s[sortedDates[sortedDates.length-1]]));
+
+    res.status(200).json({ dates: sortedDates, values: portfolioValues });
   } catch (err) {
     console.error("Error in getCumulativePortfolioValue:", err);
-    res
-      .status(500)
-      .json({ error: "Failed to compute portfolio cumulative value" });
+    res.status(500).json({ error: "Failed to compute portfolio cumulative value" });
   }
 }
+
 
 async function getChanges(req, res) {
   // here we will get the data for current networth, last week and last month. 
